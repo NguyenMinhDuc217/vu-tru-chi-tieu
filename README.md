@@ -25,14 +25,15 @@ Dữ liệu của mỗi người được lưu trong trình duyệt của chính
 xdg-open public/index.html   # hoặc mở file bằng trình duyệt bất kỳ
 ```
 
-## Deploy (Cloudflare Workers)
+## Deploy (Cloudflare Pages)
 
-Repo được kết nối với Cloudflare Workers (Workers Builds). `wrangler.jsonc` khai báo thư mục `public` là trang tĩnh cần phục vụ.
+Repo được kết nối với Cloudflare Pages, địa chỉ: https://vu-tru-chi-tieu.pages.dev
 
-- **Build command:** `bash build.sh` (hoặc để trống, vì `public/index.html` đã được commit)
-- **Deploy command:** `npx wrangler deploy`
+- **Framework preset:** None
+- **Build command:** `bash build.sh`
+- **Build output directory:** `public`
 
-Mỗi lần `git push` lên nhánh `main`, Cloudflare tự build và cập nhật trang tại `vu-tru-chi-tieu.<tài-khoản>.workers.dev`.
+Mỗi lần `git push` lên nhánh `main`, Cloudflare tự build và cập nhật trang.
 
 ## Cập nhật ứng dụng
 
