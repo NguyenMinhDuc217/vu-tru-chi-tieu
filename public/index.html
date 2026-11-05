@@ -10,9 +10,16 @@
 <script>
 // Firebase web config for the public site (https://vu-tru-chi-tieu.pages.dev).
 // These values identify the Firebase project; they are not secrets. Access to data is
-// protected by firestore.rules (each signed-in user can only read/write users/<their uid>/).
-// Leave null to run without sign-in (data stays in the browser only).
-window.FIREBASE_CONFIG = null;
+// protected by firestore.rules (each signed-in user can only read/write vutru_chitieu/<their uid>/).
+// Set to null to run without sign-in (data stays in the browser only).
+window.FIREBASE_CONFIG = {
+  apiKey: "AIzaSyC9uaEJKQLJMNYrsQzbZN-VA7Oo2vxVfLE",
+  authDomain: "python-chat-7e32a.firebaseapp.com",
+  projectId: "python-chat-7e32a",
+  storageBucket: "python-chat-7e32a.firebasestorage.app",
+  messagingSenderId: "459422323839",
+  appId: "1:459422323839:web:a1b9c9501a3ff013eb1b4a"
+};
 </script></head><body>
 <title>Vũ Trụ Chi Tiêu</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -421,7 +428,7 @@ async function deleteExpense(id) {
 
 // ---------- Storage ----------
 // Three back ends share one api: the browser (localStorage), the claude.ai artifact store,
-// and Firebase Firestore (per Google account) on the public site.
+// and Firebase Firestore (per Google account, under vutru_chitieu/<uid>/) on the public site.
 const LOCAL_KEY = 'thap-chi-tieu-v1';
 let unsubs = [];
 function stopStore() { unsubs.forEach(u => { try { u(); } catch (e) {} }); unsubs = []; }
@@ -486,7 +493,7 @@ function startRemote(db, prefix, label, onFirstSync) {
 }
 function startCloud(db) { startRemote(db, '', 'Đồng bộ trên claude.ai'); }
 
-// ----- Firebase (public site): sign in with Google, data under users/<uid>/ -----
+// ----- Firebase (public site): sign in with Google, data under vutru_chitieu/<uid>/ -----
 let fb = null;
 function startFirebase() {
   const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(window.FIREBASE_CONFIG);
@@ -502,7 +509,7 @@ function startFirebase() {
     hideSyncBanner();
     if (!user) { startLocal(); return; }
     const name = user.displayName || user.email || 'tài khoản Google';
-    startRemote(fdb, `users/${user.uid}/`, 'Đồng bộ · ' + name, cloud => offerUpload(user, cloud));
+    startRemote(fdb, `vutru_chitieu/${user.uid}/`, 'Đồng bộ · ' + name, cloud => offerUpload(user, cloud));
   });
 }
 function authError(e) {

@@ -405,7 +405,7 @@ async function deleteExpense(id) {
 
 // ---------- Storage ----------
 // Three back ends share one api: the browser (localStorage), the claude.ai artifact store,
-// and Firebase Firestore (per Google account) on the public site.
+// and Firebase Firestore (per Google account, under vutru_chitieu/<uid>/) on the public site.
 const LOCAL_KEY = 'thap-chi-tieu-v1';
 let unsubs = [];
 function stopStore() { unsubs.forEach(u => { try { u(); } catch (e) {} }); unsubs = []; }
@@ -470,7 +470,7 @@ function startRemote(db, prefix, label, onFirstSync) {
 }
 function startCloud(db) { startRemote(db, '', 'Đồng bộ trên claude.ai'); }
 
-// ----- Firebase (public site): sign in with Google, data under users/<uid>/ -----
+// ----- Firebase (public site): sign in with Google, data under vutru_chitieu/<uid>/ -----
 let fb = null;
 function startFirebase() {
   const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(window.FIREBASE_CONFIG);
@@ -486,7 +486,7 @@ function startFirebase() {
     hideSyncBanner();
     if (!user) { startLocal(); return; }
     const name = user.displayName || user.email || 'tài khoản Google';
-    startRemote(fdb, `users/${user.uid}/`, 'Đồng bộ · ' + name, cloud => offerUpload(user, cloud));
+    startRemote(fdb, `vutru_chitieu/${user.uid}/`, 'Đồng bộ · ' + name, cloud => offerUpload(user, cloud));
   });
 }
 function authError(e) {
