@@ -1,0 +1,11 @@
+// Cloudflare Workers config: serve the static site in ./public (built by build.sh).
+// "name" must match the Worker name in the Cloudflare dashboard.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vu-tru-chi-tieu",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "single-page-application"
+  }
+}
