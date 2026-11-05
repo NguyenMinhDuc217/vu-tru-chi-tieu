@@ -80,6 +80,14 @@ button,input,select,textarea{font:inherit;color:inherit}
 .iconbtn:hover{border-color:var(--accent)}
 .banner{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--warn-soft);color:var(--fg);border-radius:10px;padding:10px 12px;font-size:13px}
 .summary{display:flex;flex-direction:column;gap:12px}
+.account{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:12.5px}
+.acc-text{color:var(--muted);flex:1 1 180px;min-width:0}
+.acc-user{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto}
+.acc-user span{display:grid;min-width:0}
+.acc-user b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acc-user small{color:var(--ok);font-size:11px}
+.avatar{width:28px;height:28px;border-radius:50%;flex:none}
+.banner.sync{background:var(--accent-soft)}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;align-items:end}
 .kpis>div:first-child{grid-column:1/-1}
 .kpis>div{min-width:0}
@@ -206,6 +214,7 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
   </section>
 
   <aside class="panel">
+    <div class="account" id="account" hidden></div>
     <div class="month">
       <button class="iconbtn" id="prevM" aria-label="Tháng trước">‹</button>
       <div><div class="eyebrow">Tháng</div><h2 id="monthLabel">—</h2></div>
@@ -215,6 +224,10 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
     <div class="banner" id="sampleBanner" hidden>
       <span>Đang có <b id="sampleCount">0</b> khoản chi mẫu để bạn xem thử.</span>
       <button class="btn small danger" id="clearSamples">Xóa dữ liệu mẫu</button>
+    </div>
+    <div class="banner sync" id="syncBanner" hidden>
+      <span id="syncText"></span>
+      <span class="row-actions"><button class="btn small primary" id="syncUpload">Tải lên tài khoản</button><button class="btn small" id="syncSkip">Bỏ qua</button></span>
     </div>
 
     <section class="summary" aria-label="Tổng quan tháng">
@@ -391,18 +404,26 @@ async function deleteExpense(id) {
 }
 
 // ---------- Storage ----------
-function setMode(mode) {
+// Three back ends share one api: the browser (localStorage), the claude.ai artifact store,
+// and Firebase Firestore (per Google account) on the public site.
+const LOCAL_KEY = 'thap-chi-tieu-v1';
+let unsubs = [];
+function stopStore() { unsubs.forEach(u => { try { u(); } catch (e) {} }); unsubs = []; }
+function setMode(mode, label) {
   state.mode = mode;
   const b = $('modeBadge');
   b.className = 'mode ' + mode;
-  b.textContent = mode === 'cloud' ? 'Đồng bộ trên claude.ai' : 'Lưu trên trình duyệt này';
+  b.textContent = label || (mode === 'cloud' ? 'Đồng bộ trên claude.ai' : 'Lưu trên trình duyệt này');
 }
-function startLocal() {
-  setMode('local');
-  const KEY = 'thap-chi-tieu-v1';
-  let data = {expenses: [], budgets: {}, categories: null};
-  try { const raw = localStorage.getItem(KEY); if (raw) { const p = JSON.parse(raw); if (p && Array.isArray(p.expenses)) data = {expenses: p.expenses, budgets: p.budgets || {}, categories: p.categories || null}; } } catch (e) {}
-  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { toast('Trình duyệt không cho lưu dữ liệu. Dữ liệu sẽ mất khi đóng trang.'); } };
+function readLocal() {
+  try { const raw = localStorage.getItem(LOCAL_KEY); if (raw) { const p = JSON.parse(raw); if (p && Array.isArray(p.expenses)) return {expenses: p.expenses, budgets: p.budgets || {}, categories: p.categories || null}; } } catch (e) {}
+  return {expenses: [], budgets: {}, categories: null};
+}
+function startLocal(label) {
+  stopStore();
+  setMode('local', label);
+  let data = readLocal();
+  const persist = () => { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(data)); } catch (e) { toast('Trình duyệt không cho lưu dữ liệu. Dữ liệu sẽ mất khi đóng trang.'); } };
   const sync = () => { setCategories(data.categories); state.expenses = data.expenses.slice(); state.budgets = {...data.budgets}; state.ready = true; refresh(); };
   api = {
     add: async (d, id) => { data.expenses.push({id: id || uid(), ...d}); persist(); sync(); },
@@ -412,30 +433,125 @@ function startLocal() {
   };
   sync();
 }
-function startCloud(db) {
-  setMode('cloud');
-  const col = db.collection('expenses');
-  const settings = db.doc('settings/main');
-  let confirmed = false;
+function startRemote(db, prefix, label, onFirstSync) {
+  stopStore();
+  setMode('cloud', label);
+  state.ready = false; state.expenses = []; refresh();
+  const col = db.collection(prefix + 'expenses');
+  const settings = db.doc(prefix + 'settings/main');
+  let confirmed = false, settingsSeen = false, settingsExist = false;
   const timer = setTimeout(() => { if (!confirmed) toast('Chưa tải được dữ liệu, đang thử lại…'); }, 10000);
-  col.onSnapshot(snap => {
+  const maybeFirst = () => { if (confirmed && settingsSeen && onFirstSync) { const f = onFirstSync; onFirstSync = null; f({expenses: state.expenses, settingsExist}); } };
+  unsubs.push(col.onSnapshot(snap => {
     state.expenses = snap.docs.map(d => ({id: d.id, ...d.data()}));
     if (!snap.metadata.fromCache && !confirmed) { confirmed = true; clearTimeout(timer); }
-    state.ready = true; refresh();
-  }, err => { clearTimeout(timer); state.ready = true; refresh(); toast('Không đọc được dữ liệu (' + err.code + ').'); });
-  settings.onSnapshot(s => { const d = s.exists ? s.data() : null; setCategories(d && d.categories); state.budgets = (d && d.budgets) ? {...d.budgets} : {}; refresh(); }, () => {});
+    state.ready = true; refresh(); maybeFirst();
+  }, err => { clearTimeout(timer); state.ready = true; refresh(); toast('Không đọc được dữ liệu (' + err.code + ').'); }));
+  unsubs.push(settings.onSnapshot(s => {
+    const d = s.exists ? s.data() : null; settingsExist = !!d; settingsSeen = true;
+    setCategories(d && d.categories); state.budgets = (d && d.budgets) ? {...d.budgets} : {}; refresh(); maybeFirst();
+  }, () => { settingsSeen = true; maybeFirst(); }));
   const guard = p => p.catch(err => { if (err && err.code === 'invalid_argument') state.readOnly = true; throw err; });
   api = {
     add: (d, id) => guard(id ? col.doc(id).set(d) : col.add(d)),
     save: (id, d) => guard(col.doc(id).set(d)),
     remove: id => guard(col.doc(id).delete()),
     saveSettings: ({budgets, categories}) => guard(settings.set({budgets, categories})),
+    bulk: async (expenses, settingsData) => {
+      for (let i = 0; i < expenses.length; i += 400) {
+        const batch = db.batch();
+        expenses.slice(i, i + 400).forEach(({id, ...rest}) => batch.set(col.doc(id), rest));
+        if (i === 0 && settingsData) batch.set(settings, settingsData);
+        await batch.commit();
+      }
+      if (!expenses.length && settingsData) await settings.set(settingsData);
+    },
   };
 }
+function startCloud(db) { startRemote(db, '', 'Đồng bộ trên claude.ai'); }
+
+// ----- Firebase (public site): sign in with Google, data under users/<uid>/ -----
+let fb = null;
+function startFirebase() {
+  const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(window.FIREBASE_CONFIG);
+  const auth = firebase.auth(app), fdb = firebase.firestore(app);
+  try { fdb.enablePersistence({synchronizeTabs: true}).catch(() => {}); } catch (e) {}
+  fb = {auth, fdb};
+  $('account').hidden = false;
+  renderAccount(undefined);
+  startLocal();
+  auth.getRedirectResult().catch(e => toast(authError(e)));
+  auth.onAuthStateChanged(user => {
+    renderAccount(user || null);
+    hideSyncBanner();
+    if (!user) { startLocal(); return; }
+    const name = user.displayName || user.email || 'tài khoản Google';
+    startRemote(fdb, `users/${user.uid}/`, 'Đồng bộ · ' + name, cloud => offerUpload(user, cloud));
+  });
+}
+function authError(e) {
+  const c = e && e.code || '';
+  if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return 'Đã hủy đăng nhập.';
+  if (c === 'auth/unauthorized-domain') return 'Tên miền này chưa được cho phép đăng nhập trong Firebase (Authentication → Settings → Authorized domains).';
+  if (c === 'auth/network-request-failed') return 'Không có mạng, chưa đăng nhập được.';
+  return 'Không đăng nhập được' + (c ? ' (' + c + ')' : '') + '.';
+}
+async function signIn() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({prompt: 'select_account'});
+  try { await fb.auth.signInWithPopup(provider); }
+  catch (e) {
+    if (['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment'].includes(e.code)) { try { await fb.auth.signInWithRedirect(provider); } catch (e2) { toast(authError(e2)); } }
+    else toast(authError(e));
+  }
+}
+function renderAccount(user) {
+  const el = $('account');
+  if (user === undefined) { el.innerHTML = '<span class="acc-text">Đang kiểm tra đăng nhập…</span>'; return; }
+  if (!user) {
+    el.innerHTML = '<span class="acc-text">Đăng nhập để lưu dữ liệu trên máy chủ và đồng bộ giữa các thiết bị.</span><button class="btn small primary" type="button" data-acc="in">Đăng nhập Google</button>';
+    return;
+  }
+  const name = esc(user.displayName || user.email || 'Tài khoản Google');
+  el.innerHTML = `<span class="acc-user">${user.photoURL ? `<img class="avatar" src="${esc(user.photoURL)}" alt="" referrerpolicy="no-referrer">` : ''}<span><b>${name}</b><small>Đã đồng bộ trên mọi thiết bị</small></span></span><button class="btn small" type="button" data-acc="out">Đăng xuất</button>`;
+}
+$('account').addEventListener('click', async e => {
+  const b = e.target.closest('[data-acc]'); if (!b || !fb) return;
+  if (b.dataset.acc === 'in') signIn();
+  else { try { await fb.auth.signOut(); toast('Đã đăng xuất. App quay về dữ liệu trên trình duyệt này.'); } catch (err) { toast('Không đăng xuất được.'); } }
+});
+function hideSyncBanner() { $('syncBanner').hidden = true; }
+function offerUpload(user, cloud) {
+  const flag = 'tct-uploaded-' + user.uid;
+  try { if (localStorage.getItem(flag)) return; } catch (e) {}
+  const local = readLocal(), have = new Set(cloud.expenses.map(e => e.id));
+  const fresh = local.expenses.filter(e => !have.has(e.id));
+  const sendSettings = !cloud.settingsExist && (Object.keys(local.budgets).length || local.categories);
+  if (!fresh.length && !sendSettings) return;
+  $('syncText').textContent = fresh.length
+    ? `Trên trình duyệt này có ${fresh.length} khoản chi chưa có trong tài khoản.${sendSettings ? ' Kèm cả ngân sách và danh mục.' : ''} Tải lên để dùng trên mọi thiết bị?`
+    : 'Trên trình duyệt này có ngân sách và danh mục chưa có trong tài khoản. Tải lên?';
+  $('syncBanner').hidden = false;
+  $('syncUpload').onclick = async () => {
+    $('syncUpload').disabled = true;
+    try {
+      await api.bulk(fresh, sendSettings ? {budgets: local.budgets, categories: local.categories || CATS.map(c => ({...c}))} : null);
+      try { localStorage.setItem(flag, '1'); } catch (e) {}
+      hideSyncBanner(); toast(`Đã tải lên ${fresh.length} khoản chi vào tài khoản.`);
+    } catch (e) { toast('Tải lên chưa được. Kiểm tra mạng rồi thử lại.'); }
+    finally { $('syncUpload').disabled = false; }
+  };
+  $('syncSkip').onclick = () => { try { localStorage.setItem(flag, '1'); } catch (e) {} hideSyncBanner(); };
+}
+
 async function initStore() {
   let db = null;
   if (window.claude && typeof window.claude.use === 'function') { try { db = await window.claude.use('db'); } catch (e) { db = null; } }
-  if (db) startCloud(db); else startLocal();
+  if (db) { startCloud(db); return; }
+  if (window.firebase && window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey) {
+    try { startFirebase(); return; } catch (e) { console.warn('Firebase', e); }
+  }
+  startLocal();
 }
 
 // ---------- Derived ----------

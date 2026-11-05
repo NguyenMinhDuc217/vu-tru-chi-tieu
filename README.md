@@ -8,7 +8,10 @@
 - **Chòm sao ngày**: xem chi tiêu theo lịch tháng.
 - **Bàn tay của God**: hoạt cảnh khi thêm, sửa, xóa khoản chi hoặc mục ngân sách.
 
-Dữ liệu của mỗi người được lưu trong trình duyệt của chính họ (localStorage), không gửi lên máy chủ nào.
+Dữ liệu lưu ở đâu:
+
+- **Chưa đăng nhập:** trong trình duyệt của chính người dùng (localStorage).
+- **Đăng nhập Google:** trên Firebase Firestore, mỗi tài khoản một vùng riêng (`users/<uid>/`), tự đồng bộ giữa các thiết bị. Lần đăng nhập đầu, app đề nghị tải dữ liệu đang có trên trình duyệt lên tài khoản.
 
 ## Cấu trúc
 
@@ -17,6 +20,8 @@ Dữ liệu của mỗi người được lưu trong trình duyệt của chính
 | `thap-chi-tieu.html` | Mã nguồn ứng dụng (dạng phần thân trang, dùng chung với bản trên claude.ai) |
 | `build.sh` | Bọc mã nguồn thành trang HTML đầy đủ |
 | `public/index.html` | Trang để deploy (được tạo bởi `build.sh`) |
+| `firebase-config.js` | Cấu hình dự án Firebase cho bản công khai (để `null` thì chỉ lưu trên trình duyệt) |
+| `firestore.rules` | Quy tắc bảo mật Firestore: mỗi người chỉ đọc/ghi dữ liệu của mình |
 
 ## Chạy trên máy
 
@@ -34,6 +39,14 @@ Repo được kết nối với Cloudflare Pages, địa chỉ: https://vu-tru-c
 - **Build output directory:** `public`
 
 Mỗi lần `git push` lên nhánh `main`, Cloudflare tự build và cập nhật trang.
+
+## Firebase (đăng nhập và đồng bộ)
+
+1. Tạo dự án tại https://console.firebase.google.com
+2. **Authentication → Sign-in method:** bật **Google**
+3. **Authentication → Settings → Authorized domains:** thêm `vu-tru-chi-tieu.pages.dev`
+4. **Firestore Database:** tạo database (production mode), rồi dán nội dung `firestore.rules` vào tab **Rules** và **Publish**
+5. **Project settings → Your apps → Web app:** sao chép `firebaseConfig` vào `firebase-config.js`, chạy `./build.sh`, commit và push
 
 ## Cập nhật ứng dụng
 
