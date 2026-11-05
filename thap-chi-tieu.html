@@ -1,0 +1,1551 @@
+<title>Vũ Trụ Chi Tiêu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: full-height split — the 3D model fills the stage on the left, a ledger panel docks right; stacks vertically on phones */
+:root{
+  --bg:#F0EEFA; --panel:#FBFAFF; --fg:#1A1633; --muted:#5F5A80; --line:#DCD8EE;
+  --accent:#9A5306; --accent-ink:#FFFFFF; --accent-soft:#F5E6CF;
+  --danger:#C23A2B; --danger-soft:#F8DFDB; --warn:#A86A10; --warn-soft:#F6E8CF; --ok:#2C7D52; --ok-soft:#DCEFE3;
+  --scene-bg:#04030D;
+  --shadow:0 6px 24px rgba(20,23,41,.12);
+  --f-display:'Bricolage Grotesque','Be Vietnam Pro',system-ui,sans-serif;
+  --f-body:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --f-num:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#110E28; --panel:#18143A; --fg:#EFECFF; --muted:#A49ECD; --line:#2E2862;
+  --accent:#F2B24C; --accent-ink:#1E1404; --accent-soft:#3A2A12;
+  --danger:#F0705F; --danger-soft:#3D1D19; --warn:#E6B04C; --warn-soft:#3A2D14; --ok:#5DC48C; --ok-soft:#163324;
+  --scene-bg:#04030D;
+  --shadow:0 6px 24px rgba(0,0,0,.45); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#110E28; --panel:#18143A; --fg:#EFECFF; --muted:#A49ECD; --line:#2E2862;
+  --accent:#F2B24C; --accent-ink:#1E1404; --accent-soft:#3A2A12;
+  --danger:#F0705F; --danger-soft:#3D1D19; --warn:#E6B04C; --warn-soft:#3A2D14; --ok:#5DC48C; --ok-soft:#163324;
+  --scene-bg:#04030D;
+  --shadow:0 6px 24px rgba(0,0,0,.45); color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.45}
+*{box-sizing:border-box}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+
+.app{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 410px}
+.stage{position:relative;min-width:0;overflow:hidden;background:var(--scene-bg);
+  --fg:#F3F0FF; --muted:#B9B1E0; --panel:rgba(14,11,34,.78); --bg:rgba(26,21,60,.88); --line:rgba(180,165,255,.26);
+  --accent:#FFC861; --accent-ink:#1E1404; --danger:#FF7A6B; --shadow:0 6px 24px rgba(0,0,0,.5); color:var(--fg); color-scheme:dark}
+.stage .lbl,.stage .seg{backdrop-filter:blur(8px)}
+.stage .lbl{box-shadow:0 0 14px rgba(150,110,255,.18)}
+.brand h1{text-shadow:0 0 22px rgba(186,150,255,.55)}
+#scene{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+#scene.pointing{cursor:pointer}
+.stage-head{position:absolute;inset:0 0 auto 0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;padding:16px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));pointer-events:none}
+.stage-head>*{pointer-events:auto}
+.brand h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(22px,2.4vw,30px);letter-spacing:-.03em;line-height:1;text-wrap:balance}
+.mode{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 8px}
+.mode::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.mode.cloud::before{background:var(--ok)} .mode.local::before{background:var(--warn)}
+.seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px;box-shadow:var(--shadow)}
+.seg button{border:0;background:transparent;padding:7px 12px;border-radius:7px;cursor:pointer;font-weight:500;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.stage-foot{position:absolute;inset:auto 0 0 0;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;padding:0 max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));pointer-events:none;font-size:12px;color:var(--muted)}
+.stage-foot>*{pointer-events:auto}
+.legend{display:flex;flex-wrap:wrap;gap:4px 10px;max-width:520px}
+.legend span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.hint{opacity:.85}
+.labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lbl{position:absolute;left:0;top:0;background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:3px 8px 4px;font-size:11.5px;white-space:nowrap;box-shadow:var(--shadow);line-height:1.25;will-change:transform}
+.lbl b{display:block;font-family:var(--f-num);font-size:12px;font-weight:700}
+.lbl small{color:var(--muted);font-family:var(--f-num)}
+.lbl i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:1px;box-shadow:0 0 6px currentColor}
+.lbl.over{border-color:var(--danger)} .lbl.over b{color:var(--danger)}
+.lbl.dim{opacity:.35}
+.tooltip{position:absolute;left:0;top:0;pointer-events:none;background:var(--fg);color:var(--bg);border-radius:8px;padding:7px 10px;font-size:12px;max-width:240px;box-shadow:var(--shadow);z-index:3}
+.tooltip b{font-family:var(--f-num)}
+.god-cap{position:absolute;top:calc(74px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(14,11,34,.82);border:1px solid rgba(255,210,122,.55);color:#FFE7B0;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:0 0 22px rgba(255,190,90,.3);white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis;pointer-events:none;z-index:4}
+.nogl{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--muted)}
+
+.panel{min-width:0;overflow-y:auto;background:var(--panel);border-left:1px solid var(--line);padding-block:18px 40px;padding-left:20px;padding-right:max(20px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.month{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;gap:8px;text-align:center}
+.month h2{margin:2px 0 0;font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:-.03em}
+.iconbtn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-size:20px;line-height:1}
+.iconbtn:hover{border-color:var(--accent)}
+.banner{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--warn-soft);color:var(--fg);border-radius:10px;padding:10px 12px;font-size:13px}
+.summary{display:flex;flex-direction:column;gap:12px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;align-items:end}
+.kpis>div:first-child{grid-column:1/-1}
+.kpis>div{min-width:0}
+.big{font-size:clamp(26px,2.6vw,32px);font-weight:700;line-height:1.1;overflow-wrap:anywhere}
+.mid{font-size:15px;font-weight:700;overflow-wrap:anywhere}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--line)}
+.bar span{display:block;height:100%;min-width:2px}
+.status{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-weight:600;font-size:12px}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.danger{background:var(--danger-soft);color:var(--danger)} .pill.none{background:var(--bg);color:var(--muted)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tabs button{border:0;background:none;padding:9px 12px;cursor:pointer;color:var(--muted);font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.stack{display:flex;flex-direction:column;gap:12px}
+.btn{border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:9px 14px;cursor:pointer;font-weight:600;font-size:13px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.danger{color:var(--danger)} .btn.danger.armed{background:var(--danger);color:var(--panel);border-color:var(--danger)}
+.btn.small{padding:5px 10px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap}
+form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px}
+.lines{display:grid;gap:8px}
+.line{display:grid;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px}
+.line.bad{border-color:var(--danger)}
+.line-top{display:grid;grid-template-columns:20px minmax(0,1fr) 30px;gap:6px;align-items:center}
+.line-no{font-family:var(--f-num);font-size:11px;color:var(--muted);text-align:center}
+.line-mid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:6px;padding-left:26px}
+.line-note{margin-left:26px}
+.line input,.line select{width:100%;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:7px;padding:7px 9px}
+.line .line-note{width:calc(100% - 26px);font-size:12.5px}
+.line select{border-left-width:5px}
+.line input:focus,.line select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.line .del{width:30px;height:30px}
+.lines-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.field{display:grid;gap:4px;min-width:0}
+.field label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.field input,.field select,.field textarea{width:100%;min-width:0;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:9px 10px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+.field .help{font-size:11.5px;color:var(--muted)}
+.field .err{font-size:12px;color:var(--danger)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:3px 6px 3px 10px;color:var(--fg);font-weight:500}
+.chip button{border:0;background:var(--line);width:18px;height:18px;border-radius:50%;cursor:pointer;line-height:1;font-size:12px;padding:0}
+.day{display:flex;flex-direction:column}
+.day-h{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);padding:10px 2px 6px;border-bottom:1px solid var(--line);font-weight:600}
+.item{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 6px;border-radius:8px;cursor:pointer;border:1px solid transparent;background:none;text-align:left;width:100%}
+.item:hover{background:var(--bg)}
+.item.sel{background:var(--accent-soft);border-color:var(--accent)}
+.dot{width:10px;height:10px;border-radius:3px}
+.item .t{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .c{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .a{font-family:var(--f-num);font-weight:700;font-variant-numeric:tabular-nums}
+.item-row{display:grid;grid-template-columns:minmax(0,1fr) 34px;gap:2px;align-items:center}
+.del{width:34px;height:34px;border-radius:8px;border:0;background:none;color:var(--muted);cursor:pointer;display:grid;place-items:center;opacity:.7}
+.del:hover,.del:focus-visible{color:var(--danger);background:var(--danger-soft);opacity:1}
+.del svg{width:17px;height:17px}
+.tag{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--warn);margin-left:6px;font-weight:600}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:20px 16px;color:var(--muted);text-align:center;display:grid;gap:12px;justify-items:center}
+.brow{display:grid;grid-template-columns:20px minmax(0,1fr) 98px 26px 30px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.brow.ring-start::before{content:attr(data-ringlabel);grid-column:1/-1;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700;padding-top:6px}
+.mv{display:grid;gap:3px}
+.mv button{width:26px;height:16px;border:1px solid var(--line);background:var(--bg);border-radius:4px;cursor:pointer;color:var(--muted);display:grid;place-items:center;padding:0}
+.mv button:hover:not(:disabled){color:var(--accent);border-color:var(--accent)}
+.mv button:disabled{opacity:.3;cursor:default}
+.mv svg{width:10px;height:10px}
+.sortbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sortbar select{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 10px;min-width:0;flex:1 1 200px}
+.swatch{width:18px;height:18px;border-radius:5px;background:var(--c);position:relative;overflow:hidden;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.swatch input{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);opacity:0;cursor:pointer;border:0;padding:0}
+.swatch:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.bname{width:100%;min-width:0;border:1px solid transparent;background:transparent;border-radius:6px;padding:3px 6px;margin-left:-6px;font-weight:600}
+.bname:hover{border-color:var(--line)}
+.bname:focus{border-color:var(--accent);background:var(--bg);outline:none}
+.brow.new .bname{border-color:var(--line);background:var(--bg)}
+.brow .del{width:30px;height:30px}
+.err{font-size:12.5px;color:var(--danger)}
+.brow .n{font-weight:500}
+.brow .m{font-size:11.5px;color:var(--muted);font-family:var(--f-num)}
+.brow .m.over{color:var(--danger)}
+.mini{height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:5px}
+.mini span{display:block;height:100%}
+.brow .bamt{width:100%;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 8px;text-align:right;font-family:var(--f-num);font-size:13px}
+.note{font-size:12px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 12px 10px 16px;border-radius:10px;box-shadow:var(--shadow);font-weight:500;z-index:20;max-width:calc(100% - 32px);display:flex;align-items:center;gap:14px}
+.toast button{border:0;background:none;color:var(--accent-soft);font-weight:700;cursor:pointer;padding:4px 6px;border-radius:6px;text-decoration:underline;text-underline-offset:3px}
+
+@media (max-width:860px){
+  html,body{height:auto}
+  .app{display:block;height:auto}
+  .stage{height:60svh;min-height:360px}
+  .panel{border-left:0;border-top:1px solid var(--line);overflow:visible;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .hint{display:none}
+}
+@media (max-width:420px){ .seg button{padding:7px 9px} }
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
+</style>
+
+<div class="app">
+  <section class="stage" id="stage" aria-label="Vũ trụ chi tiêu 3D">
+    <canvas id="scene"></canvas>
+    <div class="labels" id="labels"></div>
+    <div class="tooltip" id="tooltip" hidden></div>
+    <div class="god-cap" id="godCap" role="status" hidden></div>
+    <header class="stage-head">
+      <div class="brand">
+        <h1>Vũ Trụ Chi Tiêu</h1>
+        <span class="mode" id="modeBadge">Đang kết nối…</span>
+      </div>
+      <div class="seg" aria-label="Kiểu xem 3D">
+        <button id="viewSystem" aria-pressed="true">Hệ hành tinh</button>
+        <button id="viewCal" aria-pressed="false">Chòm sao ngày</button>
+      </div>
+    </header>
+    <div class="stage-foot">
+      <div class="legend" id="legend"></div>
+      <div class="row-actions">
+        <span class="hint">Hành tinh là danh mục · Tiểu hành tinh là từng khoản chi · Lớp khí quyển là ngân sách</span>
+        <button class="btn small" id="resetCam">Đặt lại góc nhìn</button>
+      </div>
+    </div>
+  </section>
+
+  <aside class="panel">
+    <div class="month">
+      <button class="iconbtn" id="prevM" aria-label="Tháng trước">‹</button>
+      <div><div class="eyebrow">Tháng</div><h2 id="monthLabel">—</h2></div>
+      <button class="iconbtn" id="nextM" aria-label="Tháng sau">›</button>
+    </div>
+
+    <div class="banner" id="sampleBanner" hidden>
+      <span>Đang có <b id="sampleCount">0</b> khoản chi mẫu để bạn xem thử.</span>
+      <button class="btn small danger" id="clearSamples">Xóa dữ liệu mẫu</button>
+    </div>
+
+    <section class="summary" aria-label="Tổng quan tháng">
+      <div class="kpis">
+        <div><div class="eyebrow">Đã chi</div><div class="big num" id="kSpent">0 ₫</div></div>
+        <div><div class="eyebrow">Ngân sách</div><div class="mid num" id="kBudget">—</div></div>
+        <div><div class="eyebrow" id="kLeftLabel">Còn lại</div><div class="mid num" id="kLeft">—</div></div>
+      </div>
+      <div class="bar" id="catBar" role="img" aria-label="Tỷ trọng theo danh mục"></div>
+      <div class="status" id="status"></div>
+    </section>
+
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tabBtnList" aria-selected="true" aria-controls="tabList">Khoản chi</button>
+      <button role="tab" id="tabBtnBudget" aria-selected="false" aria-controls="tabBudget">Ngân sách</button>
+    </div>
+
+    <section id="tabList" class="stack" role="tabpanel">
+      <div class="row-actions"><button class="btn primary" id="addBtn">+ Thêm khoản chi</button></div>
+      <form class="card" id="form" hidden novalidate>
+        <div class="eyebrow" id="formTitle">Khoản chi mới</div>
+        <div class="field"><label for="fDate">Ngày</label><input id="fDate" type="date"></div>
+        <div class="lines" id="lines" aria-label="Các khoản chi trong ngày"></div>
+        <div class="lines-foot">
+          <button class="btn small" type="button" id="addLine">+ Thêm dòng</button>
+          <span class="note num" id="linesTotal"></span>
+        </div>
+        <span class="note">Gõ số tiền dạng 45000, 45k hoặc 1,2tr. Dòng để trống sẽ được bỏ qua.</span>
+        <div class="err" id="fErr" hidden></div>
+        <div class="row-actions">
+          <button class="btn primary" type="submit" id="fSave">Lưu</button>
+          <button class="btn" type="button" id="fCancel">Hủy</button>
+          <button class="btn danger" type="button" id="fDelete" hidden>Xóa</button>
+        </div>
+      </form>
+      <div class="filter" id="filterRow" hidden></div>
+      <div id="list"></div>
+    </section>
+
+    <section id="tabBudget" class="stack" role="tabpanel" hidden>
+      <p class="note">Dùng mũi tên ▲▼ hoặc ô Sắp xếp để đổi thứ tự. Trong hệ hành tinh, mỗi vòng quỹ đạo chứa 5 mục theo đúng thứ tự này, 5 mục đầu ở vòng gần ngôi sao nhất. Bấm vào tên mục để đổi tên, bấm ô màu để đổi màu, hoặc thêm mục mới. Mục chưa có khoản chi nào có thể xóa. Đặt mức chi tối đa cho từng mục. Trong vũ trụ, lớp khí quyển mờ quanh mỗi hành tinh là ngân sách của danh mục đó. Hành tinh to vượt khỏi lớp khí quyển (chuyển đỏ) nghĩa là đã chi vượt. Ngôi sao ở giữa đổi từ vàng sang đỏ khi tổng chi gần chạm ngân sách. Ngân sách áp dụng cho mọi tháng.</p>
+      <div class="sortbar">
+        <label class="eyebrow" for="sortCats">Sắp xếp</label>
+        <select id="sortCats">
+          <option value="">Chọn cách sắp xếp nhanh…</option>
+          <option value="name">Theo tên A → Z</option>
+          <option value="budget">Ngân sách cao → thấp</option>
+          <option value="spent">Đã chi tháng này nhiều → ít</option>
+          <option value="over">Mức dùng ngân sách cao → thấp</option>
+        </select>
+      </div>
+      <div id="budgetRows"></div>
+      <div class="err" id="bErr" hidden></div>
+      <div class="row-actions"><button class="btn" id="addCat">+ Thêm mục ngân sách</button><button class="btn primary" id="saveBudget">Lưu thay đổi</button></div>
+    </section>
+  </aside>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, '0');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const DEFAULT_CATS = [
+  {id:'an_uong',  name:'Ăn uống',          color:'#E0793C'},
+  {id:'nha_o',    name:'Nhà ở',            color:'#3B7CC0'},
+  {id:'di_lai',   name:'Đi lại',           color:'#23A08A'},
+  {id:'hoa_don',  name:'Điện, nước, mạng', color:'#7A68D8'},
+  {id:'mua_sam',  name:'Mua sắm',          color:'#D6517B'},
+  {id:'giai_tri', name:'Giải trí',         color:'#E2AE2E'},
+  {id:'suc_khoe', name:'Sức khỏe',         color:'#56A45A'},
+  {id:'giao_duc', name:'Học tập',          color:'#3FAED6'},
+  {id:'khac',     name:'Khác',             color:'#8E8C7E'},
+];
+const PALETTE = ['#E0793C','#3B7CC0','#23A08A','#7A68D8','#D6517B','#E2AE2E','#56A45A','#3FAED6','#8E8C7E','#C45BD9','#F06A4D','#2FC5A0','#5B6CF0','#B5893A','#E8589C','#4BB8B0'];
+let CATS = DEFAULT_CATS.map(c => ({...c}));
+let CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
+const catOf = id => CAT[id] || CAT.khac || CATS[CATS.length - 1];
+function setCategories(list) {
+  const ok = Array.isArray(list) ? list.filter(c => c && c.id && String(c.name || '').trim()).map(c => ({id: String(c.id), name: String(c.name).trim().slice(0, 40), color: /^#[0-9a-f]{6}$/i.test(c.color) ? c.color : '#8E8C7E'})) : [];
+  CATS = ok.length ? ok : DEFAULT_CATS.map(c => ({...c}));
+  CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
+  renderLegend(); fillCatSelects();
+}
+function nextColor(used) { return PALETTE.find(c => !used.includes(c.toLowerCase())) || '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0'); }
+const DEFAULT_BUDGETS = {an_uong:4500000,nha_o:6000000,di_lai:1000000,hoa_don:1300000,mua_sam:1500000,giai_tri:1000000,suc_khoe:800000,giao_duc:1200000,khac:600000};
+const WEEKDAY = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+const WD_SHORT = ['T2','T3','T4','T5','T6','T7','CN'];
+
+const nf = new Intl.NumberFormat('vi-VN');
+const fmt = n => nf.format(Math.round(n || 0)) + ' ₫';
+const fmtShort = n => {
+  n = Math.round(n || 0);
+  if (n >= 1e6) return (n / 1e6).toLocaleString('vi-VN', {maximumFractionDigits: n >= 1e7 ? 1 : 2}) + ' tr';
+  if (n >= 1e3) return Math.round(n / 1e3) + 'k';
+  return String(n);
+};
+function parseAmount(s) {
+  s = String(s || '').trim().toLowerCase().replace(/\s+/g, '');
+  if (!s) return NaN;
+  let mult = 1;
+  const mm = s.match(/(triệu|tr|m|nghìn|ngàn|k)$/);
+  if (mm) { mult = /^(triệu|tr|m)$/.test(mm[1]) ? 1e6 : 1e3; s = s.slice(0, -mm[1].length); }
+  if (mult > 1) { const v = parseFloat(s.replace(',', '.')); return isFinite(v) ? Math.round(v * mult) : NaN; }
+  const v = parseInt(s.replace(/[.,₫đ]/g, ''), 10);
+  return isFinite(v) ? v : NaN;
+}
+const today = new Date();
+const todayStr = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+const parseDate = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const daysIn = (y, m) => new Date(y, m, 0).getDate();
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+// Sample month generator (marked sample:true so they can be cleared in one click)
+function sampleMonth(y, m, upto) {
+  const last = Math.min(daysIn(y, m), upto || 99);
+  const out = []; let seed = y * 100 + m;
+  const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+  const r = (a, b) => Math.round((a + rnd() * (b - a)) / 1000) * 1000;
+  const add = (d, title, cat, amount, note = '') => { if (d <= last) out.push({title, cat, amount, date:`${y}-${pad(m)}-${pad(d)}`, note, sample:true}); };
+  for (let d = 1; d <= last; d++) { const w = new Date(y, m-1, d).getDay(); if (w >= 1 && w <= 5) { add(d, 'Ăn trưa', 'an_uong', r(35000, 60000)); if (rnd() < .55) add(d, 'Cà phê', 'an_uong', r(29000, 49000)); } }
+  [2,9,16,23,30].forEach(d => add(d, 'Đi chợ cuối tuần', 'an_uong', r(260000, 420000)));
+  [6,20].forEach(d => add(d, 'Ăn tối cùng gia đình', 'an_uong', r(380000, 650000)));
+  add(1, 'Tiền thuê nhà', 'nha_o', 5500000, 'Chuyển khoản cho chủ nhà'); add(14, 'Sửa vòi nước', 'nha_o', 180000);
+  add(3, 'Tiền điện', 'hoa_don', r(620000, 780000)); add(4, 'Internet', 'hoa_don', 230000); add(6, 'Tiền nước', 'hoa_don', r(110000, 140000)); add(10, 'Cước điện thoại', 'hoa_don', 150000);
+  [5,12,19,26].forEach(d => add(d, 'Đổ xăng', 'di_lai', r(80000, 105000)));
+  add(8, 'Grab đi làm', 'di_lai', 64000); add(15, 'Gửi xe tháng', 'di_lai', 120000); add(21, 'Xe khách về quê', 'di_lai', r(180000, 240000));
+  add(10, 'Áo sơ mi', 'mua_sam', 420000); add(18, 'Đồ gia dụng', 'mua_sam', 315000); add(27, 'Giày thể thao', 'mua_sam', 1150000);
+  add(13, 'Xem phim', 'giai_tri', 180000); add(20, 'Gói xem phim trực tuyến', 'giai_tri', 260000); add(25, 'Karaoke với bạn', 'giai_tri', 350000);
+  add(2, 'Phòng gym tháng', 'suc_khoe', 500000); add(11, 'Thuốc cảm', 'suc_khoe', 95000);
+  add(7, 'Khóa học tiếng Anh', 'giao_duc', 900000); add(15, 'Sách', 'giao_duc', 185000);
+  add(17, 'Quà sinh nhật bạn', 'khac', 300000); add(28, 'Mừng cưới đồng nghiệp', 'khac', 500000);
+  return out;
+}
+
+// ---------- State ----------
+const state = {
+  y: today.getFullYear(), m: today.getMonth() + 1,
+  view: 'system', filter: {cat: null, day: null},
+  editingId: null, selectedId: null,
+  expenses: [], budgets: {}, ready: false, mode: null, readOnly: false,
+};
+let api = null;
+let animateNext = true;
+
+// ---------- Toast ----------
+let toastT;
+function toast(msg, action) {
+  const t = $('toast'); t.textContent = '';
+  const span = document.createElement('span'); span.textContent = msg; t.appendChild(span);
+  if (action) { const b = document.createElement('button'); b.type = 'button'; b.textContent = action.label; b.onclick = () => { t.hidden = true; clearTimeout(toastT); action.run(); }; t.appendChild(b); }
+  t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, action ? 6000 : 2800);
+}
+const TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
+async function deleteExpense(id) {
+  const exp = state.expenses.find(x => x.id === id); if (!exp) return;
+  const {id: _drop, ...data} = exp;
+  if (exp.date.startsWith(monthPrefix())) godPush([{type: 'remove', cat: catOf(exp.cat).id, id, size: rockSize(id)}]);
+  try {
+    await api.remove(id);
+    if (state.editingId === id) closeForm();
+    if (state.selectedId === id) state.selectedId = null;
+    refresh();
+    toast(`Đã xóa “${exp.title}” (${fmt(exp.amount)})`, {label: 'Hoàn tác', run: async () => {
+      const nid = uid(); if (data.date.startsWith(monthPrefix())) godPush([{type: 'add', cat: catOf(data.cat).id, ids: [nid]}]);
+      try { await api.add(data, nid); toast('Đã khôi phục khoản chi'); } catch (e) { toast('Không khôi phục được. Hãy thêm lại thủ công.'); }
+    }});
+  } catch (e) { toast(state.readOnly ? 'Bạn chỉ có quyền xem, không thể xóa.' : 'Không xóa được. Kiểm tra kết nối rồi thử lại.'); }
+}
+
+// ---------- Storage ----------
+function setMode(mode) {
+  state.mode = mode;
+  const b = $('modeBadge');
+  b.className = 'mode ' + mode;
+  b.textContent = mode === 'cloud' ? 'Đồng bộ trên claude.ai' : 'Lưu trên trình duyệt này';
+}
+function startLocal() {
+  setMode('local');
+  const KEY = 'thap-chi-tieu-v1';
+  let data = {expenses: [], budgets: {}, categories: null};
+  try { const raw = localStorage.getItem(KEY); if (raw) { const p = JSON.parse(raw); if (p && Array.isArray(p.expenses)) data = {expenses: p.expenses, budgets: p.budgets || {}, categories: p.categories || null}; } } catch (e) {}
+  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { toast('Trình duyệt không cho lưu dữ liệu. Dữ liệu sẽ mất khi đóng trang.'); } };
+  const sync = () => { setCategories(data.categories); state.expenses = data.expenses.slice(); state.budgets = {...data.budgets}; state.ready = true; refresh(); };
+  api = {
+    add: async (d, id) => { data.expenses.push({id: id || uid(), ...d}); persist(); sync(); },
+    save: async (id, d) => { const i = data.expenses.findIndex(e => e.id === id); if (i >= 0) data.expenses[i] = {id, ...d}; persist(); sync(); },
+    remove: async id => { data.expenses = data.expenses.filter(e => e.id !== id); persist(); sync(); },
+    saveSettings: async ({budgets, categories}) => { data.budgets = budgets; data.categories = categories; persist(); sync(); },
+  };
+  sync();
+}
+function startCloud(db) {
+  setMode('cloud');
+  const col = db.collection('expenses');
+  const settings = db.doc('settings/main');
+  let confirmed = false;
+  const timer = setTimeout(() => { if (!confirmed) toast('Chưa tải được dữ liệu, đang thử lại…'); }, 10000);
+  col.onSnapshot(snap => {
+    state.expenses = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    if (!snap.metadata.fromCache && !confirmed) { confirmed = true; clearTimeout(timer); }
+    state.ready = true; refresh();
+  }, err => { clearTimeout(timer); state.ready = true; refresh(); toast('Không đọc được dữ liệu (' + err.code + ').'); });
+  settings.onSnapshot(s => { const d = s.exists ? s.data() : null; setCategories(d && d.categories); state.budgets = (d && d.budgets) ? {...d.budgets} : {}; refresh(); }, () => {});
+  const guard = p => p.catch(err => { if (err && err.code === 'invalid_argument') state.readOnly = true; throw err; });
+  api = {
+    add: (d, id) => guard(id ? col.doc(id).set(d) : col.add(d)),
+    save: (id, d) => guard(col.doc(id).set(d)),
+    remove: id => guard(col.doc(id).delete()),
+    saveSettings: ({budgets, categories}) => guard(settings.set({budgets, categories})),
+  };
+}
+async function initStore() {
+  let db = null;
+  if (window.claude && typeof window.claude.use === 'function') { try { db = await window.claude.use('db'); } catch (e) { db = null; } }
+  if (db) startCloud(db); else startLocal();
+}
+
+// ---------- Derived ----------
+const monthPrefix = () => `${state.y}-${pad(state.m)}-`;
+const monthItems = () => state.expenses.filter(e => typeof e.date === 'string' && e.date.startsWith(monthPrefix()) && Number(e.amount) > 0);
+function totalsByCat(items) { const t = Object.fromEntries(CATS.map(c => [c.id, 0])); items.forEach(e => { t[catOf(e.cat).id] += Number(e.amount); }); return t; }
+const budgetOf = id => Number(state.budgets[id]) || 0;
+const totalBudget = () => CATS.reduce((s, c) => s + budgetOf(c.id), 0);
+
+// ---------- Panel rendering ----------
+function renderSummary(items) {
+  $('monthLabel').textContent = `${state.m} / ${state.y}`;
+  const spent = items.reduce((s, e) => s + Number(e.amount), 0);
+  const tb = totalBudget();
+  $('kSpent').textContent = fmt(spent);
+  $('kBudget').textContent = tb ? fmt(tb) : 'Chưa đặt';
+  const left = tb - spent;
+  $('kLeftLabel').textContent = tb && left < 0 ? 'Vượt' : 'Còn lại';
+  $('kLeft').textContent = tb ? fmt(Math.abs(left)) : '—';
+  $('kLeft').style.color = tb && left < 0 ? 'var(--danger)' : '';
+  const t = totalsByCat(items);
+  $('catBar').innerHTML = spent ? CATS.filter(c => t[c.id] > 0).map(c => `<span style="flex:${t[c.id]};background:${c.color}" title="${esc(c.name)}: ${fmt(t[c.id])}"></span>`).join('') : '';
+  let pill;
+  if (!tb) pill = '<span class="pill none">Chưa có ngân sách</span>';
+  else if (spent > tb) pill = `<span class="pill danger">Vượt ngân sách ${Math.round((spent/tb-1)*100)}%</span>`;
+  else if (spent > tb * .85) pill = `<span class="pill warn">Đã dùng ${Math.round(spent/tb*100)}% ngân sách</span>`;
+  else pill = `<span class="pill ok">Đã dùng ${Math.round(spent/tb*100)}% ngân sách</span>`;
+  const isCur = state.y === today.getFullYear() && state.m === today.getMonth() + 1;
+  const dayCount = isCur ? today.getDate() : daysIn(state.y, state.m);
+  const overCats = CATS.filter(c => budgetOf(c.id) && t[c.id] > budgetOf(c.id)).map(c => c.name);
+  let extra = spent ? `Trung bình ${fmtShort(spent / dayCount)}/ngày` : '';
+  if (overCats.length) extra += (extra ? ' · ' : '') + `Vượt: ${overCats.join(', ')}`;
+  $('status').innerHTML = pill + (extra ? `<span>${esc(extra)}</span>` : '');
+  const samples = state.expenses.filter(e => e.sample).length;
+  $('sampleBanner').hidden = !samples; $('sampleCount').textContent = samples;
+}
+function renderList(items) {
+  const list = $('list'), fr = $('filterRow');
+  if (!state.ready) { list.innerHTML = '<div class="empty">Đang tải dữ liệu…</div>'; fr.hidden = true; return; }
+  let shown = items;
+  const chips = [];
+  if (state.filter.cat) { shown = shown.filter(e => catOf(e.cat).id === state.filter.cat); chips.push(`<span class="chip">${esc(CAT[state.filter.cat].name)}<button data-clear="cat" aria-label="Bỏ lọc danh mục">×</button></span>`); }
+  if (state.filter.day) { shown = shown.filter(e => e.date === state.filter.day); const d = parseDate(state.filter.day); chips.push(`<span class="chip">Ngày ${d.getDate()}/${d.getMonth()+1}<button data-clear="day" aria-label="Bỏ lọc ngày">×</button></span>`); }
+  fr.hidden = !chips.length;
+  fr.innerHTML = chips.length ? `<span>Đang lọc:</span>${chips.join('')}<span class="num">${fmt(shown.reduce((s,e)=>s+Number(e.amount),0))}</span>` : '';
+  if (!items.length) {
+    list.innerHTML = `<div class="empty"><div>Chưa có khoản chi nào trong tháng ${state.m}/${state.y}.<br>Nhấn <b>+ Thêm khoản chi</b> để ghi khoản đầu tiên.</div>${state.readOnly ? '' : '<button class="btn small" id="loadSample">Tải dữ liệu mẫu để xem thử</button>'}</div>`;
+    return;
+  }
+  if (!shown.length) { list.innerHTML = '<div class="empty">Không có khoản chi nào khớp bộ lọc.</div>'; return; }
+  const groups = {};
+  shown.forEach(e => (groups[e.date] = groups[e.date] || []).push(e));
+  list.innerHTML = Object.keys(groups).sort().reverse().map(date => {
+    const g = groups[date].sort((a, b) => (b.amount - a.amount));
+    const d = parseDate(date);
+    const sum = g.reduce((s, e) => s + Number(e.amount), 0);
+    return `<div class="day"><div class="day-h"><span>${WEEKDAY[d.getDay()]}, ${pad(d.getDate())}/${pad(d.getMonth()+1)}${date === todayStr ? ' · Hôm nay' : ''}</span><span class="num">${fmt(sum)}</span></div>` +
+      g.map(e => { const c = catOf(e.cat); return `<div class="item-row"><button class="item${e.id === state.selectedId ? ' sel' : ''}" data-id="${esc(e.id)}"><span class="dot" style="background:${c.color}"></span><span style="min-width:0"><div class="t">${esc(e.title)}${e.sample ? '<span class="tag">mẫu</span>' : ''}</div><div class="c">${esc(c.name)}${e.note ? ' · ' + esc(e.note) : ''}</div></span><span class="a">${fmt(e.amount)}</span></button>${state.readOnly ? '' : `<button class="del" data-del="${esc(e.id)}" aria-label="Xóa ${esc(e.title)}" title="Xóa khoản chi này">${TRASH}</button>`}</div>`; }).join('') + '</div>';
+  }).join('');
+}
+let budgetDirty = false;
+function budgetRow(c, spent, isNew) {
+  const b = budgetOf(c.id), used = state.expenses.some(e => e.cat === c.id);
+  return `<div class="brow${isNew ? ' new' : ''}" data-row="${esc(c.id)}">
+    <label class="swatch" style="--c:${c.color}"><input type="color" data-color value="${c.color}" aria-label="Màu của mục ${esc(c.name)}"></label>
+    <div style="min-width:0"><input class="bname" data-name maxlength="40" value="${esc(c.name)}" placeholder="Tên mục mới" aria-label="Tên mục"><div data-meta="${esc(c.id)}">${isNew ? '<div class="m">Mục mới · nhập tên và ngân sách</div>' : budgetMeta(c, spent)}</div></div>
+    <input class="bamt" data-amt inputmode="decimal" aria-label="Ngân sách ${esc(c.name)}" placeholder="Chưa đặt" value="${b ? nf.format(b) : ''}">
+    <div class="mv"><button type="button" data-mv="-1" aria-label="Đưa mục ${esc(c.name)} lên" title="Đưa lên"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 7 5 3l3.5 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" data-mv="1" aria-label="Đưa mục ${esc(c.name)} xuống" title="Đưa xuống"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 3 5 7l3.5-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    ${used ? '<span></span>' : `<button type="button" class="del" data-rmcat aria-label="Xóa mục ${esc(c.name)}" title="Xóa mục này">${TRASH}</button>`}
+  </div>`;
+}
+function renderBudget(items) {
+  const t = totalsByCat(items);
+  const box = $('budgetRows');
+  if (budgetDirty && box.childElementCount) {
+    CATS.forEach(c => { const el = box.querySelector(`[data-meta="${c.id}"]`); if (el && !el.closest('.new')) el.innerHTML = budgetMeta(c, t[c.id]); });
+    return;
+  }
+  box.innerHTML = CATS.map(c => budgetRow(c, t[c.id], false)).join('');
+  $('bErr').hidden = true; markRings();
+}
+function markRings() {
+  const rows = [...$('budgetRows').children];
+  rows.forEach((r, i) => {
+    const ring = Math.floor(i / 5) + 1;
+    r.classList.toggle('ring-start', i % 5 === 0);
+    r.dataset.ringlabel = `Vòng ${ring}` + (ring === 1 ? ' · gần ngôi sao nhất' : '');
+    const [up, dn] = r.querySelectorAll('[data-mv]'); up.disabled = i === 0; dn.disabled = i === rows.length - 1;
+  });
+}
+function budgetMeta(c, spent) {
+  const b = budgetOf(c.id);
+  const pct = b ? Math.min(100, spent / b * 100) : 0;
+  const over = b && spent > b;
+  return `<div class="m${over ? ' over' : ''}">Đã chi ${fmtShort(spent)}${b ? ' / ' + fmtShort(b) + (over ? ' · vượt ' + fmtShort(spent - b) : '') : ''}</div>` +
+    (b ? `<div class="mini"><span style="width:${pct}%;background:${over ? 'var(--danger)' : c.color}"></span></div>` : '');
+}
+function fillCatSelects() {
+  document.querySelectorAll('#lines select[data-f="cat"]').forEach(sel => { const v = sel.value; sel.innerHTML = catOptions(CAT[v] ? v : CATS[0].id); paintLine(sel.closest('.line')); });
+}
+function catOptions(selected) { return CATS.map(c => `<option value="${esc(c.id)}"${c.id === selected ? ' selected' : ''}>${esc(c.name)}</option>`).join(''); }
+function renderLegend() { $('legend').innerHTML = CATS.map(c => `<span><i style="background:${c.color}"></i>${esc(c.name)}</span>`).join(''); }
+
+function refresh() {
+  const items = monthItems();
+  renderSummary(items); renderList(items); renderBudget(items);
+  $('addBtn').disabled = state.readOnly;
+  rebuildScene(animateNext); animateNext = false;
+}
+
+// ---------- Form ----------
+const form = $('form');
+function defaultDate() { return todayStr.startsWith(monthPrefix()) ? todayStr : (state.filter.day || monthPrefix() + '01'); }
+let lineSeq = 0;
+const lineEls = () => [...$('lines').children];
+function paintLine(line) { if (!line) return; const sel = line.querySelector('[data-f="cat"]'); sel.style.borderLeftColor = catOf(sel.value).color; }
+function addLine(d = {}, focus = true) {
+  const box = $('lines'), n = lineSeq++;
+  const last = box.lastElementChild;
+  const cat = d.cat ? catOf(d.cat).id : (last ? last.querySelector('[data-f="cat"]').value : (state.filter.cat || CATS[0].id));
+  box.insertAdjacentHTML('beforeend', `<div class="line" data-line="${n}">
+    <div class="line-top"><span class="line-no"></span><input data-f="title" id="l${n}_title" maxlength="80" placeholder="Tên khoản chi (VD: Ăn trưa)" autocomplete="off"><button type="button" class="del" data-rm title="Bỏ dòng này">${TRASH}</button></div>
+    <div class="line-mid"><input data-f="amount" id="l${n}_amount" inputmode="decimal" placeholder="Số tiền" autocomplete="off"><select data-f="cat" id="l${n}_cat">${catOptions(cat)}</select></div>
+    <input data-f="note" id="l${n}_note" class="line-note" maxlength="140" placeholder="Ghi chú (không bắt buộc)" autocomplete="off">
+  </div>`);
+  const el = box.lastElementChild;
+  el.querySelector('[data-f="title"]').value = d.title || '';
+  el.querySelector('[data-f="amount"]').value = d.amount ? nf.format(d.amount) : '';
+  el.querySelector('[data-f="note"]').value = d.note || '';
+  paintLine(el); renumberLines();
+  if (focus) el.querySelector('[data-f="title"]').focus();
+  return el;
+}
+function renumberLines() {
+  const ls = lineEls();
+  ls.forEach((l, i) => {
+    l.querySelector('.line-no').textContent = i + 1;
+    const rm = l.querySelector('[data-rm]'); rm.hidden = ls.length < 2 || !!state.editingId; rm.setAttribute('aria-label', `Bỏ dòng ${i + 1}`);
+    l.querySelector('[data-f="title"]').setAttribute('aria-label', `Tên khoản chi dòng ${i + 1}`);
+    l.querySelector('[data-f="amount"]').setAttribute('aria-label', `Số tiền dòng ${i + 1}`);
+    l.querySelector('[data-f="cat"]').setAttribute('aria-label', `Danh mục dòng ${i + 1}`);
+  });
+  updateLinesTotal();
+}
+function updateLinesTotal() {
+  const ls = lineEls(); let sum = 0, cnt = 0;
+  ls.forEach(l => { const v = parseAmount(l.querySelector('[data-f="amount"]').value); if (v > 0) { sum += v; cnt++; } });
+  $('linesTotal').textContent = state.editingId || (ls.length < 2 && !cnt) ? '' : `${ls.length} dòng · Tổng ${fmt(sum)}`;
+  $('fSave').textContent = state.editingId ? 'Lưu thay đổi' : cnt > 1 ? `Lưu ${cnt} khoản` : 'Lưu';
+}
+function openForm(exp) {
+  state.editingId = exp ? exp.id : null;
+  $('formTitle').textContent = exp ? 'Sửa khoản chi' : 'Thêm khoản chi';
+  $('fDate').value = exp ? exp.date : defaultDate();
+  $('lines').innerHTML = '';
+  addLine(exp ? {title: exp.title, amount: exp.amount, cat: exp.cat, note: exp.note} : {}, false);
+  $('addLine').hidden = !!exp;
+  $('fErr').hidden = true;
+  $('fDelete').hidden = !exp; disarm($('fDelete'), 'Xóa');
+  form.hidden = false; $('addBtn').hidden = true;
+  if (!exp) lineEls()[0].querySelector('[data-f="title"]').focus({preventScroll: false});
+  form.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+}
+function closeForm() { form.hidden = true; $('addBtn').hidden = false; state.editingId = null; }
+function formError(msg) { $('fErr').textContent = msg; $('fErr').hidden = false; }
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const date = $('fDate').value;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return formError('Chọn ngày chi tiêu.');
+  const rows = [];
+  const ls = lineEls(); ls.forEach(l => l.classList.remove('bad'));
+  for (let i = 0; i < ls.length; i++) {
+    const l = ls[i], title = l.querySelector('[data-f="title"]').value.trim(), raw = l.querySelector('[data-f="amount"]').value.trim();
+    const note = l.querySelector('[data-f="note"]').value.trim();
+    if (!title && !raw && !note) continue;
+    const amount = parseAmount(raw);
+    const where = ls.length > 1 ? `Dòng ${i + 1}: ` : '';
+    if (!title) { l.classList.add('bad'); l.querySelector('[data-f="title"]').focus(); return formError(where + 'nhập tên khoản chi, ví dụ “Ăn trưa”.'); }
+    if (!(amount > 0)) { l.classList.add('bad'); l.querySelector('[data-f="amount"]').focus(); return formError(where + 'số tiền chưa hợp lệ. Gõ dạng 45000, 45k hoặc 1,2tr.'); }
+    rows.push({title, amount, cat: l.querySelector('[data-f="cat"]').value, note});
+  }
+  if (!rows.length) return formError('Nhập ít nhất một khoản chi.');
+  const prev = state.editingId ? state.expenses.find(x => x.id === state.editingId) : null;
+  $('fSave').disabled = true;
+  try {
+    if (state.editingId) {
+      const r = rows[0], eid = state.editingId;
+      if (prev && date.startsWith(monthPrefix()) && prev.date.startsWith(monthPrefix())) {
+        const oc = catOf(prev.cat).id, nc = catOf(r.cat).id;
+        godPush(oc === nc ? [{type: 'reshape', cat: nc, ids: [eid], oldR: curR(nc)}]
+                          : [{type: 'remove', cat: oc, id: '__moved__' + eid, size: rockSize(eid)}, {type: 'add', cat: nc, ids: [eid]}]);
+      }
+      await api.save(eid, {...r, date, createdAt: (prev && prev.createdAt) || Date.now()});
+      toast('Đã lưu thay đổi');
+    } else {
+      const t0 = Date.now(), ids = rows.map(() => uid());
+      if (date.startsWith(monthPrefix())) {
+        const byCat = new Map(); rows.forEach((r, i) => { const c = catOf(r.cat).id; if (!byCat.has(c)) byCat.set(c, []); byCat.get(c).push(ids[i]); });
+        godPush([...byCat].map(([cat, list]) => ({type: 'add', cat, ids: list})));
+      }
+      for (let i = 0; i < rows.length; i++) await api.add({...rows[i], date, createdAt: t0 + i}, ids[i]);
+      const sum = rows.reduce((s, r) => s + r.amount, 0);
+      toast(rows.length > 1 ? `Đã thêm ${rows.length} khoản · ${fmt(sum)}` : `Đã thêm ${fmt(sum)}`);
+    }
+    const [y, m] = date.split('-').map(Number);
+    closeForm();
+    if (y !== state.y || m !== state.m) { state.y = y; state.m = m; state.filter = {cat: null, day: null}; animateNext = true; refresh(); }
+  } catch (err) {
+    formError(state.readOnly ? 'Bạn chỉ có quyền xem trang này, không thể lưu.' : 'Không lưu được. Kiểm tra kết nối rồi thử lại.');
+  } finally { $('fSave').disabled = false; }
+});
+$('fCancel').onclick = closeForm;
+$('addBtn').onclick = () => { state.selectedId = null; openForm(null); highlightSelection(); };
+$('addLine').onclick = () => addLine();
+$('lines').addEventListener('input', e => { const l = e.target.closest('.line'); if (l) l.classList.remove('bad'); $('fErr').hidden = true; updateLinesTotal(); });
+$('lines').addEventListener('change', e => { if (e.target.matches('[data-f="cat"]')) paintLine(e.target.closest('.line')); });
+$('lines').addEventListener('focusout', e => { if (e.target.matches('[data-f="amount"]')) { const v = parseAmount(e.target.value); if (v > 0) e.target.value = nf.format(v); } });
+$('lines').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (!b) return; b.closest('.line').remove(); renumberLines(); });
+
+// two-step confirm buttons
+const armTimers = new WeakMap();
+function disarm(btn, label) { btn.classList.remove('armed'); btn.textContent = label; clearTimeout(armTimers.get(btn)); }
+function armOrRun(btn, label, armedLabel, run) {
+  if (btn.classList.contains('armed')) { disarm(btn, label); run(); return; }
+  btn.classList.add('armed'); btn.textContent = armedLabel;
+  armTimers.set(btn, setTimeout(() => disarm(btn, label), 3500));
+}
+$('fDelete').onclick = () => armOrRun($('fDelete'), 'Xóa', 'Nhấn lần nữa để xóa', async () => {
+  const id = state.editingId; if (!id) return;
+  const ex = state.expenses.find(x => x.id === id);
+  if (ex && ex.date.startsWith(monthPrefix())) godPush([{type: 'remove', cat: catOf(ex.cat).id, id, size: rockSize(id)}]);
+  try { await api.remove(id); toast('Đã xóa khoản chi'); state.selectedId = null; closeForm(); refresh(); }
+  catch (e) { formError('Không xóa được. Thử lại sau.'); }
+});
+$('clearSamples').onclick = () => armOrRun($('clearSamples'), 'Xóa dữ liệu mẫu', 'Nhấn lần nữa để xác nhận', async () => {
+  const ids = state.expenses.filter(e => e.sample).map(e => e.id);
+  try { for (const id of ids) await api.remove(id); toast(`Đã xóa ${ids.length} khoản chi mẫu`); }
+  catch (e) { toast('Không xóa được hết dữ liệu mẫu. Thử lại sau.'); }
+});
+async function loadSample() {
+  const isCur = state.y === today.getFullYear() && state.m === today.getMonth() + 1;
+  const rows = sampleMonth(state.y, state.m, isCur ? today.getDate() : 99).map(r => ({...r, createdAt: Date.now()}));
+  try {
+    if (!totalBudget()) await api.saveSettings({budgets: {...DEFAULT_BUDGETS}, categories: CATS.map(c => ({...c}))});
+    for (const r of rows) await api.add(r);
+    toast(`Đã thêm ${rows.length} khoản chi mẫu`); animateNext = true; refresh();
+  } catch (e) { toast('Không tải được dữ liệu mẫu.'); }
+}
+
+// list interactions
+$('list').addEventListener('click', e => {
+  if (e.target.closest('#loadSample')) { loadSample(); return; }
+  const del = e.target.closest('.del'); if (del) { deleteExpense(del.dataset.del); return; }
+  const it = e.target.closest('.item'); if (!it) return;
+  const exp = state.expenses.find(x => x.id === it.dataset.id); if (!exp) return;
+  state.selectedId = exp.id; openForm(exp); renderList(monthItems()); highlightSelection();
+});
+$('filterRow').addEventListener('click', e => {
+  const b = e.target.closest('[data-clear]'); if (!b) return;
+  state.filter[b.dataset.clear] = null; renderList(monthItems()); updateDim();
+});
+
+// tabs
+function showTab(which) {
+  const isList = which === 'list';
+  $('tabList').hidden = !isList; $('tabBudget').hidden = isList;
+  $('tabBtnList').setAttribute('aria-selected', isList); $('tabBtnBudget').setAttribute('aria-selected', !isList);
+}
+$('tabBtnList').onclick = () => showTab('list');
+$('tabBtnBudget').onclick = () => { budgetDirty = false; renderBudget(monthItems()); showTab('budget'); };
+$('budgetRows').addEventListener('input', e => {
+  budgetDirty = true; $('bErr').hidden = true;
+  if (e.target.matches('[data-color]')) e.target.parentElement.style.setProperty('--c', e.target.value);
+});
+$('budgetRows').addEventListener('focusout', e => { if (e.target.matches('[data-amt]')) { const v = parseAmount(e.target.value); e.target.value = v > 0 ? nf.format(v) : ''; } });
+$('budgetRows').addEventListener('click', e => {
+  const b = e.target.closest('[data-rmcat]'); if (!b) return;
+  if ($('budgetRows').childElementCount <= 1) { $('bErr').textContent = 'Cần giữ lại ít nhất một mục.'; $('bErr').hidden = false; return; }
+  budgetDirty = true; b.closest('.brow').remove(); markRings();
+});
+$('budgetRows').addEventListener('click', e => {
+  const b = e.target.closest('[data-mv]'); if (!b || b.disabled) return;
+  const box = $('budgetRows'), row = b.closest('.brow');
+  if (b.dataset.mv === '-1' && row.previousElementSibling) box.insertBefore(row, row.previousElementSibling);
+  else if (b.dataset.mv === '1' && row.nextElementSibling) box.insertBefore(row.nextElementSibling, row);
+  budgetDirty = true; markRings();
+  if (b.disabled) (b.dataset.mv === '-1' ? row.querySelector('[data-mv="1"]') : row.querySelector('[data-mv="-1"]')).focus(); else b.focus();
+});
+$('sortCats').addEventListener('change', e => {
+  const mode = e.target.value; if (!mode) return;
+  const box = $('budgetRows'), t = totalsByCat(monthItems());
+  const info = r => { const id = r.dataset.row, b = parseAmount(r.querySelector('[data-amt]').value) || 0, sp = t[id] || 0; return {r, name: r.querySelector('[data-name]').value.trim(), b, sp, use: b ? sp / b : (sp ? Infinity : 0)}; };
+  const rows = [...box.children].map(info);
+  const cmp = {name: (a, b) => a.name.localeCompare(b.name, 'vi'), budget: (a, b) => b.b - a.b, spent: (a, b) => b.sp - a.sp, over: (a, b) => b.use - a.use}[mode];
+  rows.sort(cmp).forEach(x => box.appendChild(x.r));
+  budgetDirty = true; markRings(); e.target.value = '';
+  toast('Đã sắp xếp. Bấm “Lưu thay đổi” để áp dụng cho hệ hành tinh.');
+});
+$('addCat').onclick = () => {
+  const box = $('budgetRows');
+  const used = [...box.querySelectorAll('[data-color]')].map(i => i.value.toLowerCase());
+  const c = {id: 'c_' + uid(), name: '', color: nextColor(used)};
+  budgetDirty = true;
+  box.insertAdjacentHTML('beforeend', budgetRow(c, 0, true));
+  markRings();
+  const row = box.lastElementChild; row.querySelector('[data-name]').focus();
+  row.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+};
+$('saveBudget').onclick = async () => {
+  const rows = [...$('budgetRows').querySelectorAll('.brow')];
+  const categories = [], budgets = {}, seen = new Set();
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i], name = r.querySelector('[data-name]').value.trim();
+    const bad = msg => { $('bErr').textContent = msg; $('bErr').hidden = false; r.querySelector('[data-name]').focus(); };
+    if (!name) return bad(`Mục thứ ${i + 1} chưa có tên.`);
+    if (seen.has(name.toLowerCase())) return bad(`Tên “${name}” bị trùng. Mỗi mục cần một tên riêng.`);
+    seen.add(name.toLowerCase());
+    categories.push({id: r.dataset.row, name, color: r.querySelector('[data-color]').value});
+    const v = parseAmount(r.querySelector('[data-amt]').value); if (v > 0) budgets[r.dataset.row] = v;
+  }
+  const oldCats = new Map(CATS.map(c => [c.id, c])), newIds = new Set(categories.map(c => c.id)), tasks = [];
+  CATS.forEach(c => { if (!newIds.has(c.id)) { const cap = capturePlanet(c.id); if (cap) tasks.push({type: 'crush', cat: c.id, ...cap}); } });
+  categories.forEach(c => {
+    const o = oldCats.get(c.id);
+    if (!o) tasks.push({type: 'create', cat: c.id});
+    else if (o.name !== c.name || o.color.toLowerCase() !== c.color.toLowerCase() || budgetOf(c.id) !== (budgets[c.id] || 0)) tasks.push({type: 'reshape', cat: c.id, oldR: curR(c.id)});
+  });
+  godPush(tasks);
+  $('saveBudget').disabled = true;
+  try { await api.saveSettings({budgets, categories}); budgetDirty = false; renderBudget(monthItems()); if (state.view === 'system') fitCamera(); toast('Đã lưu ngân sách, danh mục và thứ tự'); }
+  catch (e) { toast(state.readOnly ? 'Bạn chỉ có quyền xem, không thể lưu ngân sách.' : 'Không lưu được. Kiểm tra kết nối rồi thử lại.'); }
+  finally { $('saveBudget').disabled = false; }
+};
+
+// month nav
+function shiftMonth(d) {
+  godAbort();
+  let m = state.m + d, y = state.y;
+  if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; }
+  state.y = y; state.m = m; state.filter = {cat: null, day: null}; state.selectedId = null; closeForm();
+  animateNext = true; refresh();
+}
+$('prevM').onclick = () => shiftMonth(-1);
+$('nextM').onclick = () => shiftMonth(1);
+
+renderLegend();
+
+// ---------- 3D scene: Vũ trụ chi tiêu ----------
+const stage = $('stage'), canvas = $('scene'), labelsEl = $('labels'), tip = $('tooltip');
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SPACE = '#120C34', GOLD = '#FFD27A', OVER = '#FF6B7A', ORBIT = '#B6A6FF', INK = '#F3F0FF', SELECT = '#FFF1B0';
+let twinkle = [], nebulae = [], dust = null, galaxy = null;
+let renderer = null, scene, camera, controls, content, system = null, sunLight, sunGlow = null, raycaster;
+let unitIco, unitRock, unitSphere, unitBox;
+const SHARED = new Set();
+let pickables = [], labels = [], meshById = new Map(), spinners = [];
+let ringAngles = [], ringGroups = [], planetInfo = new Map();
+const PER_RING = 5, RING0 = 4.3, RING_GAP = 3.2;
+const ringCount = () => Math.max(1, Math.ceil(CATS.length / PER_RING));
+const mix = (a, b, t) => new THREE.Color(a).lerp(new THREE.Color(b), t);
+const glowCache = {};
+const bright = c => mix(c, '#ffffff', .18);
+const bandCache = {};
+function bandTex(color) {
+  const key = '#' + new THREE.Color(color).getHexString();
+  if (bandCache[key]) return bandCache[key];
+  const c = document.createElement('canvas'); c.width = 256; c.height = 128; const g = c.getContext('2d');
+  let seed = parseInt(key.slice(1), 16) % 233280; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const shades = [mix(key, '#000000', .28), new THREE.Color(key), mix(key, '#ffffff', .22), new THREE.Color(key), mix(key, '#000000', .14), mix(key, '#ffffff', .1)];
+  let y = 0;
+  while (y < 128) { const h = 5 + rnd() * 16; g.fillStyle = '#' + shades[Math.floor(rnd() * shades.length)].getHexString(); g.fillRect(0, y, 256, h + 1); y += h; }
+  g.globalAlpha = .18;
+  for (let i = 0; i < 40; i++) { g.fillStyle = rnd() > .5 ? '#ffffff' : '#000000'; g.fillRect(rnd() * 256, rnd() * 128, 20 + rnd() * 80, 1 + rnd() * 2); }
+  const t = new THREE.CanvasTexture(c); t.__cached = true; return bandCache[key] = t;
+}
+function rimMat(color, power = 2.6, strength = 1.4) {
+  return new THREE.ShaderMaterial({
+    uniforms: {c: {value: new THREE.Color(color)}, p: {value: power}, s: {value: strength}},
+    vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
+    fragmentShader: 'uniform vec3 c; uniform float p; uniform float s; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - max(dot(vN, vV), 0.0), p); gl_FragColor = vec4(c * f * s, f); }',
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+  });
+}
+function cloudTex() {
+  if (glowCache.cloud) return glowCache.cloud;
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  for (let i = 0; i < 46; i++) {
+    const a = rnd() * Math.PI * 2, d = Math.pow(rnd(), .7) * 82, x = 128 + Math.cos(a) * d, y = 128 + Math.sin(a) * d, r = 22 + rnd() * 60;
+    const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(255,255,255,${.1 + rnd() * .16})`); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+  }
+  g.globalCompositeOperation = 'destination-in';
+  const m = g.createRadialGradient(128, 128, 20, 128, 128, 128); m.addColorStop(0, 'rgba(0,0,0,1)'); m.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = m; g.fillRect(0, 0, 256, 256);
+  return glowCache.cloud = new THREE.CanvasTexture(c);
+}
+function skyTex() {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 512; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(256, 230, 10, 256, 256, 380);
+  gr.addColorStop(0, '#0D0A24'); gr.addColorStop(.5, '#06051A'); gr.addColorStop(1, '#010108');
+  g.fillStyle = gr; g.fillRect(0, 0, 512, 512);
+  return new THREE.CanvasTexture(c);
+}
+function glowTex() {
+  if (glowCache.t) return glowCache.t;
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.18, 'rgba(255,255,255,.75)'); gr.addColorStop(.45, 'rgba(255,255,255,.18)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+  glowCache.t = new THREE.CanvasTexture(c); glowCache.t.__cached = true; return glowCache.t;
+}
+function glowSprite(color, scale, opacity = 1) {
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTex(), color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity}));
+  s.scale.setScalar(scale); return s;
+}
+function starColorFor(ratio, hasBudget) {
+  if (!hasBudget || ratio < .7) return new THREE.Color('#FFD36B');
+  if (ratio <= 1) return mix('#FFD36B', '#FF9A3D', (ratio - .7) / .3);
+  return mix('#FF9A3D', '#FF4F3F', Math.min(1, (ratio - 1) / .3));
+}
+
+function initScene() {
+  if (typeof THREE === 'undefined') throw new Error('three');
+  renderer = new THREE.WebGLRenderer({canvas, antialias: true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  scene = new THREE.Scene(); scene.background = skyTex();
+  camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500);
+  controls = new THREE.OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.minPolarAngle = 0.08; controls.maxPolarAngle = Math.PI * 0.62; controls.minDistance = 5; controls.maxDistance = 110;
+  scene.add(new THREE.AmbientLight(0xc4bcf0, 0.75));
+  scene.add(new THREE.HemisphereLight(0x9fd8ff, 0x6a3aa8, 0.35));
+  sunLight = new THREE.PointLight(0xffe2a0, 2.0, 0, 1); scene.add(sunLight);
+  unitIco = new THREE.IcosahedronGeometry(1, 2); unitRock = new THREE.IcosahedronGeometry(1, 0);
+  unitSphere = new THREE.SphereGeometry(1, 40, 20); unitBox = new THREE.BoxGeometry(1, 1, 1);
+  [unitIco, unitRock, unitSphere, unitBox].forEach(g => SHARED.add(g));
+  makeStarfield();
+  content = new THREE.Group(); scene.add(content);
+  raycaster = new THREE.Raycaster();
+  new ResizeObserver(resize).observe(stage); resize();
+  bindPointer();
+  requestAnimationFrame(loop);
+}
+function makeStarfield() {
+  const pts = (n, fill, size, opacity) => {
+    const pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) { const [x, y, z, c] = fill(i); pos.set([x, y, z], i * 3); col.set([c.r, c.g, c.b], i * 3); }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    const m = new THREE.PointsMaterial({size, map: glowTex(), vertexColors: true, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true});
+    const P = new THREE.Points(g, m); scene.add(P); return P;
+  };
+  const tints = ['#FFFFFF', '#CFE0FF', '#FFE7C2', '#E2D6FF', '#BFF6FF'].map(c => new THREE.Color(c));
+  const sphere = (rMin, rMax) => { const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, r = rMin + Math.random() * (rMax - rMin), s = Math.sqrt(1 - u * u); return [Math.cos(th) * s * r, u * r, Math.sin(th) * s * r]; };
+  for (let layer = 0; layer < 3; layer++) {
+    const P = pts(1300, i => [...sphere(85, 170), tints[(i + layer) % 5].clone().multiplyScalar(.6 + Math.random() * .4)], 1.3 + layer * .55, .9);
+    twinkle.push({m: P.material, ph: layer * 2.1, sp: .7 + layer * .45});
+  }
+  // galactic band
+  const band = ['#B48CFF', '#FF8FD8', '#7FE7FF', '#FFFFFF', '#8FA8FF'].map(c => new THREE.Color(c));
+  const gauss = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
+  const milky = pts(5200, i => { const a = Math.random() * Math.PI * 2, r = 75 + Math.random() * 60; return [Math.cos(a) * r, gauss() * 9, Math.sin(a) * r, band[i % 5].clone().multiplyScalar(.35 + Math.random() * .5)]; }, .95, .7);
+  milky.rotation.set(.55, 0, .35); milky.material.opacity = .45;
+  // the system sits inside a spiral galaxy; a second one glows far away
+  const spiral = (n, arms, rMin, rMax, twist, y0, thick, size, inner, outer, dimInside) => pts(n, i => {
+    const t = Math.pow(Math.random(), .62), r = rMin + t * (rMax - rMin), arm = i % arms;
+    const a = r * twist + arm * Math.PI * 2 / arms + gauss() * (.14 + .16 * (1 - t));
+    const spread = gauss() * (.3 + r * .022);
+    const col = mix(inner, outer, Math.min(1, t * 1.15)).multiplyScalar((r < dimInside ? .35 : .75) + Math.random() * .25);
+    return [Math.cos(a) * r + spread * Math.sin(a), y0 + gauss() * thick * (1 - t * .7), Math.sin(a) * r - spread * Math.cos(a), col];
+  }, size, 1);
+  galaxy = spiral(16000, 4, 2.5, 62, .16, -1.1, .9, .55, '#FFB25E', '#5577FF', 15);
+  const arms2 = spiral(9000, 4, 4, 62, .16, -1.15, .6, .4, '#FF55C4', '#33D6FF', 15);
+  galaxy.add(arms2); scene.remove(arms2);
+  const bulge = glowSprite('#FFCF8A', 11, .35); bulge.position.y = -1; galaxy.add(bulge);
+  // luminous arm glow + star-forming knots trace the spiral clearly
+  for (let arm = 0; arm < 4; arm++) for (let r = 14; r < 62; r += 2.2) {
+    const a = r * .16 + arm * Math.PI / 2, t = (r - 14) / 48;
+    const glow = glowSprite('#' + mix('#C77DFF', '#4F7BFF', t).getHexString(), 9 + r * .08, .09);
+    glow.position.set(Math.cos(a) * r, -1.2, Math.sin(a) * r); galaxy.add(glow);
+    if ((r * 7 + arm * 3) % 5 < 1.4) {
+      const knot = glowSprite(arm % 2 ? '#FF6FD0' : '#6FE8FF', 2.4 + (r % 3), .6);
+      knot.position.set(Math.cos(a + .05) * (r + 1), -1.1, Math.sin(a + .05) * (r + 1)); galaxy.add(knot);
+    }
+  }
+  const far = spiral(5000, 2, .5, 16, .35, 0, .5, .55, '#FFE6C0', '#B49CFF', 0);
+  far.position.set(-95, 42, -125); far.rotation.set(1.05, .3, .4);
+  const farCore = glowSprite('#FFE0B0', 9, .7); far.add(farCore);
+  // nebulae
+  [['#7B3FE4', -70, 22, -105, 130], ['#E04FB0', 95, -12, -80, 115], ['#2BB8D9', -35, -42, 115, 120], ['#4B6BFF', 60, 40, 90, 105], ['#FF7A59', 120, 18, 30, 80], ['#3FD3B0', -115, -8, 20, 95]].forEach(([c, x, y, z, sc], i) => {
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: cloudTex(), color: c, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: .5, rotation: i}));
+    sp.scale.setScalar(sc); sp.position.set(x, y, z); scene.add(sp);
+    const core = glowSprite(c, sc * .45, .22); core.position.set(x, y, z); scene.add(core);
+    nebulae.push({m: sp.material, v: (i % 2 ? 1 : -1) * (.006 + i * .002)});
+  });
+  // drifting cosmic dust around the system
+  const dustC = ['#D9CCFF', '#9FE9FF', '#FFC9EE'].map(c => new THREE.Color(c));
+  dust = pts(900, i => { const a = Math.random() * Math.PI * 2, r = 2 + Math.random() * 18; return [Math.cos(a) * r, gauss() * 2.2, Math.sin(a) * r, dustC[i % 3].clone().multiplyScalar(.5 + Math.random() * .5)]; }, .16, .75);
+}
+function applyTheme(rebuild = true) { if (rebuild) rebuildScene(false); } // space looks the same in both themes
+function resize() {
+  if (!renderer) return;
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setSize(w, h, false); camera.aspect = w / Math.max(h, 1); camera.updateProjectionMatrix();
+}
+function fitCamera() {
+  const narrow = camera.aspect < 1 ? 1.55 : camera.aspect < 1.3 ? 1.15 : 1;
+  if (state.view === 'system') { const f = Math.max(.72, (RING0 + (ringCount() - 1) * RING_GAP + 3.5) / 15.3); camera.position.set(0, 15 * f * narrow, 22 * f * narrow); controls.target.set(0, 0, 0); }
+  else { camera.position.set(0, 11.5 * narrow, 13.5 * narrow); controls.target.set(0, .9, .5); }
+  controls.update();
+}
+function disposeContent() {
+  content.traverse(o => {
+    if (o.geometry && !SHARED.has(o.geometry)) o.geometry.dispose();
+    const ms = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
+    ms.forEach(m => { if (m.map && !m.map.__cached) m.map.dispose(); m.dispose(); });
+  });
+  content.clear();
+  labelsEl.innerHTML = ''; labels = []; pickables = []; meshById = new Map(); spinners = []; system = null; ringGroups = []; planetInfo = new Map(); sunGlow = null; hovered = null; tip.hidden = true;
+}
+function textTexture(draw, w = 256, h = 256) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
+}
+function addLabel(html, x, y, z, cls = '', key = '', parent = content) {
+  const a = new THREE.Object3D(); a.position.set(x, y, z); parent.add(a);
+  const el = document.createElement('div'); el.className = 'lbl ' + cls; el.innerHTML = html; el.dataset.key = key;
+  labelsEl.appendChild(el); labels.push({el, a});
+}
+function glowMat(color, intensity, extra = {}) {
+  const m = new THREE.MeshStandardMaterial(Object.assign({color, roughness: .6, metalness: .05, flatShading: true, emissive: color, emissiveIntensity: intensity}, extra));
+  m.userData.baseEmissive = new THREE.Color(color); m.userData.baseIntensity = intensity; return m;
+}
+function setGlow(m, mode) {
+  const mat = m.material;
+  if (mode === 'select') { mat.emissive.set(SELECT); mat.emissiveIntensity = .9; }
+  else if (mode === 'hover') { mat.emissive.set('#FFFFFF'); mat.emissiveIntensity = .45; }
+  else { mat.emissive.copy(mat.userData.baseEmissive || new THREE.Color(0)); mat.emissiveIntensity = mat.userData.baseIntensity ?? 1; }
+}
+function monthRatio(items) {
+  const tb = totalBudget(), spent = items.reduce((s, e) => s + Number(e.amount), 0);
+  return {tb, spent, ratio: tb ? spent / tb : 0};
+}
+function buildSystem(items) {
+  const {tb, ratio} = monthRatio(items);
+  const starC = starColorFor(ratio, !!tb);
+  sunLight.position.set(0, 0, 0); sunLight.color.copy(mix(starC, '#ffffff', .35)); sunLight.intensity = 1.7;
+  const core = new THREE.Mesh(unitIco, new THREE.MeshBasicMaterial({color: mix(starC, '#ffffff', .4)}));
+  core.scale.setScalar(1.05); core.userData = {type: 'total'}; content.add(core); pickables.push(core);
+  sunGlow = glowSprite(starC, 6.2, 1); content.add(sunGlow);
+  content.add(glowSprite(starC, 16, .32));
+  const corona = new THREE.Mesh(unitSphere, rimMat(starC, 1.6, 2.2)); corona.scale.setScalar(1.45); content.add(corona);
+  addLabel(tb ? `Ngôi sao tháng ${state.m}<b>${Math.round(ratio * 100)}% ngân sách</b>` : `Ngôi sao tháng ${state.m}<b>chưa đặt ngân sách</b>`, 0, 1.7, 0, tb && ratio > 1 ? 'over' : '', 'total');
+
+  system = new THREE.Group(); content.add(system);
+  for (let k = 0; k < ringCount(); k++) {
+    const R = RING0 + k * RING_GAP, pts = [];
+    for (let j = 0; j <= 160; j++) { const a = j / 160 * Math.PI * 2; pts.push(new THREE.Vector3(Math.cos(a) * R, 0, Math.sin(a) * R)); }
+    content.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color: ORBIT, transparent: true, opacity: .34, blending: THREE.AdditiveBlending})));
+    const g = new THREE.Group(); if (ringAngles[k] === undefined) ringAngles[k] = k * .5; g.rotation.y = ringAngles[k]; system.add(g); ringGroups.push(g);
+  }
+  const t = totalsByCat(items);
+  const byCat = {}; items.forEach(e => (byCat[catOf(e.cat).id] = byCat[catOf(e.cat).id] || []).push(e));
+  const maxV = Math.max(1, ...CATS.map(c => Math.max(t[c.id], budgetOf(c.id))));
+  const k = 0.88 / Math.cbrt(maxV);
+  const maxAmt = Math.max(1, ...items.map(e => Number(e.amount)));
+  CATS.forEach((c, i) => {
+    const ring = Math.floor(i / PER_RING), slot = i % PER_RING;
+    const R = RING0 + ring * RING_GAP, ang = -Math.PI / 2 + slot * Math.PI * 2 / PER_RING + ring * Math.PI / PER_RING;
+    const pg = new THREE.Group(); pg.position.set(Math.cos(ang) * R, 0, Math.sin(ang) * R); ringGroups[ring].add(pg);
+    const spent = t[c.id], b = budgetOf(c.id), over = b && spent > b;
+    const r = spent > 0 ? Math.max(.14, k * Math.cbrt(spent)) : .12;
+    const pcol = spent ? c.color : '#' + mix(c.color, '#4a4580', .6).getHexString();
+    const planet = new THREE.Mesh(unitSphere, new THREE.MeshStandardMaterial({map: bandTex(pcol), roughness: .62, metalness: 0, emissive: pcol, emissiveIntensity: spent ? .2 : .1}));
+    planet.scale.setScalar(r); planet.userData = {type: 'cat', cat: c.id}; pg.add(planet); pickables.push(planet);
+    spinners.push({g: planet, v: .25 + i * .03});
+    const halo = new THREE.Mesh(unitSphere, rimMat(c.color, 3.2, spent ? 1.0 : .5)); halo.scale.setScalar(r * 1.1); pg.add(halo);
+    let outer = r;
+    if (b) {
+      const rb = Math.max(.16, k * Math.cbrt(b)), col = over ? OVER : c.color;
+      const atm = new THREE.Mesh(unitSphere, rimMat(col, over ? 2.4 : 3.4, over ? 1.1 : .7));
+      atm.scale.setScalar(rb); pg.add(atm);
+      const eq = new THREE.Mesh(new THREE.TorusGeometry(rb, .014, 6, 72), new THREE.MeshBasicMaterial({color: col, transparent: true, opacity: over ? .95 : .7, blending: THREE.AdditiveBlending}));
+      eq.rotation.x = Math.PI / 2; pg.add(eq);
+      outer = Math.max(r, rb);
+    }
+    const list = (byCat[c.id] || []).slice().sort((a, b2) => a.date < b2.date ? -1 : a.date > b2.date ? 1 : 0);
+    const belt = new THREE.Group(); belt.rotation.set(.35 + (i % 3) * .18, 0, i % 2 ? .2 : -.15); pg.add(belt);
+    spinners.push({g: belt, v: .1 + (i % 4) * .03});
+    const ringR = outer + .34;
+    list.forEach((e, j) => {
+      const a = j / list.length * Math.PI * 2, sz = .035 + .12 * Math.cbrt(Number(e.amount) / maxAmt);
+      const rock = new THREE.Mesh(unitRock, glowMat(c.color, .32));
+      rock.scale.setScalar(sz); rock.position.set(Math.cos(a) * ringR, j % 2 ? .05 : -.05, Math.sin(a) * ringR); rock.rotation.set(j, j * 1.7, 0);
+      rock.userData = {type: 'expense', id: e.id, cat: c.id, s: sz}; belt.add(rock); pickables.push(rock); meshById.set(e.id, rock);
+    });
+    planetInfo.set(c.id, {cat: c.id, pg, planet, r, outer, ringR, belt});
+    addLabel(`<i style="background:${c.color};color:${c.color}"></i>${esc(c.name)}<b>${fmtShort(spent)}${b ? ` <small>/ ${fmtShort(b)}</small>` : ''}</b>`, 0, outer + .38, 0, over ? 'over' : '', 'cat:' + c.id, pg);
+  });
+}
+function buildConstellation(items) {
+  sunLight.position.set(0, 9, 5); sunLight.color.set('#ffe7b8'); sunLight.intensity = 1.1;
+  const days = daysIn(state.y, state.m), first = (new Date(state.y, state.m - 1, 1).getDay() + 6) % 7;
+  const rows = Math.ceil((first + days) / 7), sp = 1.55;
+  const byDay = {}; items.forEach(e => (byDay[e.date] = byDay[e.date] || []).push(e));
+  const totals = {}; Object.keys(byDay).forEach(d => totals[d] = byDay[d].reduce((s, e) => s + Number(e.amount), 0));
+  const maxDay = Math.max(1, ...Object.values(totals));
+  const S = 3.0 / maxDay, zOff = .5, zTop = (-(rows - 1) / 2) * sp + zOff;
+  const baseGeo = new THREE.CylinderGeometry(.56, .56, .05, 6);
+  WD_SHORT.forEach((w, col) => {
+    const tex = textTexture((g, W, H) => { g.fillStyle = col >= 5 ? GOLD : '#C9C0F5'; g.font = `700 ${H * .5}px 'Be Vietnam Pro', system-ui, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(w, W / 2, H / 2); }, 128, 64);
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(1, .5), new THREE.MeshBasicMaterial({map: tex, transparent: true, depthWrite: false}));
+    p.rotation.x = -Math.PI / 2; p.position.set((col - 3) * sp, .02, zTop - 1.1); content.add(p);
+  });
+  const tops = [];
+  for (let d = 1; d <= days; d++) {
+    const idx = first + d - 1, col = idx % 7, row = Math.floor(idx / 7);
+    const x = (col - 3) * sp, z = (row - (rows - 1) / 2) * sp + zOff;
+    const date = `${state.y}-${pad(state.m)}-${pad(d)}`, isToday = date === todayStr;
+    const topTex = textTexture((g, W, H) => {
+      g.fillStyle = col >= 5 ? '#3A2D7A' : '#2B2468'; g.fillRect(0, 0, W, H);
+      if (isToday) { g.strokeStyle = GOLD; g.lineWidth = 14; g.beginPath(); g.arc(W / 2, H / 2, W / 2 - 14, 0, Math.PI * 2); g.stroke(); }
+      g.fillStyle = isToday ? GOLD : INK; g.font = `800 ${W * .24}px 'Bricolage Grotesque', system-ui, sans-serif`;
+      g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(d), W * .33, H * .3);
+    });
+    const side = new THREE.MeshStandardMaterial({color: '#4A3C9A', emissive: '#2A2070', roughness: .5});
+    const base = new THREE.Mesh(baseGeo, [side, new THREE.MeshBasicMaterial({map: topTex}), side]);
+    base.position.set(x, .025, z); base.rotation.y = Math.PI / 2; base.userData = {type: 'day', date}; content.add(base); pickables.push(base);
+    let y = .05;
+    (byDay[date] || []).sort((a, b) => b.amount - a.amount).forEach(e => {
+      const c = catOf(e.cat), h = Math.max(Number(e.amount) * S, .03), gap = h > .08 ? .014 : 0;
+      const m = new THREE.Mesh(unitBox, glowMat(c.color, .38, {roughness: .3, flatShading: false, transparent: true, opacity: .95}));
+      m.scale.set(.26, h - gap, .26); m.position.set(x + .13, y + (h - gap) / 2, z + .13);
+      m.userData = {type: 'expense', id: e.id, cat: c.id}; content.add(m); pickables.push(m); meshById.set(e.id, m);
+      y += h;
+    });
+    const tot = totals[date] || 0;
+    const star = glowSprite(tot ? GOLD : '#8E95B2', tot ? .45 + .9 * Math.sqrt(tot / maxDay) : .22, tot ? 1 : .45);
+    star.position.set(x + .13, y + .16, z + .13); content.add(star);
+    tops.push(new THREE.Vector3(x + .13, y + .16, z + .13));
+  }
+  content.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(tops), new THREE.LineBasicMaterial({color: GOLD, transparent: true, opacity: .75, blending: THREE.AdditiveBlending})));
+}
+let anim = null;
+function rebuildScene(animate) {
+  if (!renderer) return;
+  if (god.running) { god.pendingRebuild = true; god.pendingAnimate = god.pendingAnimate || animate; return; }
+  disposeContent();
+  const items = monthItems();
+  if (state.view === 'system') buildSystem(items); else buildConstellation(items);
+  if (animate) { fitCamera(); if (!reduceMotion) { content.scale.setScalar(0.001); anim = {start: performance.now(), dur: 1100}; } }
+  highlightSelection(); updateDim();
+  tryStartGod();
+}
+function highlightSelection() { meshById.forEach((m, id) => setGlow(m, id === state.selectedId ? 'select' : 'base')); }
+function updateDim() {
+  if (!renderer) return;
+  const {cat, day} = state.filter;
+  const byId = new Map(state.expenses.map(e => [e.id, e]));
+  meshById.forEach(m => {
+    const e = byId.get(m.userData.id);
+    const on = (!cat || m.userData.cat === cat) && (!day || (e && e.date === day));
+    const baseOpacity = state.view === 'system' ? 1 : .93;
+    m.material.transparent = true; m.material.opacity = on ? baseOpacity : 0.14; m.material.depthWrite = on;
+  });
+  labels.forEach(l => l.el.classList.toggle('dim', !!cat && l.el.dataset.key !== 'cat:' + cat && l.el.dataset.key !== 'total'));
+}
+
+// pointer & picking
+let pointer = {x: 0, y: 0, nx: 0, ny: 0, inside: false, dirty: false}, down = null, hovered = null;
+function pick(nx, ny) {
+  raycaster.setFromCamera({x: nx, y: ny}, camera);
+  const hit = raycaster.intersectObjects(pickables, false)[0];
+  return hit ? hit.object : null;
+}
+function describe(o) {
+  const u = o.userData;
+  if (u.type === 'expense') { const e = state.expenses.find(x => x.id === u.id); if (!e) return ''; const d = parseDate(e.date); return `${esc(e.title)}<br><b>${fmt(e.amount)}</b><br>${esc(catOf(e.cat).name)} · ${d.getDate()}/${d.getMonth()+1}`; }
+  if (u.type === 'cat') { const t = totalsByCat(monthItems())[u.cat], b = budgetOf(u.cat); return `Hành tinh ${esc(CAT[u.cat].name)}<br><b>${fmt(t)}</b>${b ? `<br>Ngân sách ${fmt(b)} · đã dùng ${Math.round(t / b * 100)}%` : '<br>Chưa đặt ngân sách'}<br>Nhấn để lọc danh sách`; }
+  if (u.type === 'day') { const g = monthItems().filter(e => e.date === u.date); const d = parseDate(u.date); return `${WEEKDAY[d.getDay()]}, ${d.getDate()}/${d.getMonth()+1}<br><b>${fmt(g.reduce((s, e) => s + Number(e.amount), 0))}</b> · ${g.length} khoản<br>Nhấn để lọc danh sách`; }
+  if (u.type === 'total') { const {tb, spent, ratio} = monthRatio(monthItems()); return `Tổng tháng ${state.m}<br><b>${fmt(spent)}</b>${tb ? ` / ${fmt(tb)}<br>Ngôi sao chuyển từ vàng sang đỏ khi tiêu gần hết ngân sách (${Math.round(ratio * 100)}%)` : '<br>Đặt ngân sách để ngôi sao đổi màu'}`; }
+  return '';
+}
+function showTip(o, x, y) {
+  const html = o ? describe(o) : '';
+  if (!html) { tip.hidden = true; return; }
+  tip.innerHTML = html; tip.hidden = false;
+  const w = tip.offsetWidth, h = tip.offsetHeight, W = stage.clientWidth;
+  const tx = Math.min(Math.max(8, x + 14), W - w - 8), ty = Math.max(8, y - h - 12);
+  tip.style.transform = `translate(${tx}px, ${ty}px)`;
+}
+function setHover(o) {
+  if (hovered === o) return;
+  if (hovered && hovered.userData.type === 'expense') setGlow(hovered, hovered.userData.id === state.selectedId ? 'select' : 'base');
+  hovered = o;
+  if (o && o.userData.type === 'expense' && o.userData.id !== state.selectedId) setGlow(o, 'hover');
+  canvas.classList.toggle('pointing', !!o);
+}
+function bindPointer() {
+  const pos = e => { const r = canvas.getBoundingClientRect(); return {x: e.clientX - r.left, y: e.clientY - r.top, nx: ((e.clientX - r.left) / r.width) * 2 - 1, ny: -((e.clientY - r.top) / r.height) * 2 + 1}; };
+  canvas.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; Object.assign(pointer, pos(e), {inside: true, dirty: true}); });
+  canvas.addEventListener('pointerleave', () => { pointer.inside = false; setHover(null); tip.hidden = true; });
+  canvas.addEventListener('pointerdown', e => { down = {x: e.clientX, y: e.clientY}; tip.hidden = true; });
+  canvas.addEventListener('pointerup', e => {
+    if (!down) return;
+    const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y); down = null;
+    if (moved > 6) return;
+    const p = pos(e), o = pick(p.nx, p.ny);
+    if (!o) return;
+    const u = o.userData;
+    if (u.type === 'expense') {
+      const exp = state.expenses.find(x => x.id === u.id); if (!exp) return;
+      state.selectedId = exp.id; showTab('list'); openForm(exp); renderList(monthItems()); highlightSelection();
+      const row = $('list').querySelector(`[data-id="${CSS.escape(exp.id)}"]`); if (row && window.innerWidth > 860) row.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+    } else if (u.type === 'cat') {
+      state.filter.cat = state.filter.cat === u.cat ? null : u.cat; showTab('list'); renderList(monthItems()); updateDim();
+    } else if (u.type === 'day') {
+      state.filter.day = state.filter.day === u.date ? null : u.date; showTab('list'); renderList(monthItems()); updateDim();
+    } else if (u.type === 'total') {
+      state.filter = {cat: null, day: null}; renderList(monthItems()); updateDim();
+    }
+    if (e.pointerType !== 'mouse') { showTip(o, p.x, p.y); clearTimeout(showTip.t); showTip.t = setTimeout(() => tip.hidden = true, 2600); }
+  });
+  $('resetCam').onclick = () => fitCamera();
+}
+const _v = typeof THREE !== 'undefined' ? new THREE.Vector3() : null;
+function updateLabels() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  for (const l of labels) {
+    l.a.getWorldPosition(_v); _v.project(camera);
+    if (_v.z > 1) { l.el.style.visibility = 'hidden'; continue; }
+    l.el.style.visibility = '';
+    l.el.style.transform = `translate(${(_v.x + 1) / 2 * w}px, ${(1 - _v.y) / 2 * h}px) translate(-50%, -100%)`;
+  }
+}
+let lastT = performance.now();
+function loop(now) {
+  requestAnimationFrame(loop);
+  now = performance.now();
+  const dt = Math.max(0, Math.min(.05, (now - lastT) / 1000)); lastT = now;
+  if (anim) {
+    const k = Math.min(1, Math.max(0, (performance.now() - anim.start) / anim.dur));
+    content.scale.setScalar(Math.max(0.001, 1 - Math.pow(1 - k, 3)));
+    if (k >= 1) anim = null;
+  }
+  if (!reduceMotion) {
+    if (system && !hovered && !god.running) ringGroups.forEach((g, k) => { ringAngles[k] += dt * .034 / (1 + k * .55); g.rotation.y = ringAngles[k]; });
+    if (!hovered) spinners.forEach(s => { s.g.rotation.y += s.v * dt; });
+    if (sunGlow) sunGlow.scale.setScalar(6.2 * (1 + .045 * Math.sin(now / 650)));
+    const ts = now / 1000;
+    twinkle.forEach(t => { t.m.opacity = .55 + .4 * Math.sin(ts * t.sp + t.ph); });
+    nebulae.forEach(n => { n.m.rotation += n.v * dt; });
+    if (dust) dust.rotation.y += dt * .012;
+    if (galaxy) galaxy.rotation.y += dt * .006;
+  }
+  stepGod(dt);
+  controls.update();
+  if (pointer.dirty && pointer.inside && !down) {
+    pointer.dirty = false;
+    const o = pick(pointer.nx, pointer.ny); setHover(o); showTip(o, pointer.x, pointer.y);
+  }
+  renderer.render(scene, camera);
+  updateLabels();
+}
+
+// ---------- Bàn tay của God ----------
+const god = {queue: [], running: false, abort: false, pendingRebuild: false, pendingAnimate: false, tweens: [], fx: [], lastTry: 0};
+let hand = null;
+const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const E = {
+  inOut: k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2,
+  out: k => 1 - Math.pow(1 - k, 3),
+  in: k => k * k * k,
+  back: k => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); },
+  lin: k => k,
+};
+function tween(dur, fn, ease = E.inOut) {
+  return new Promise(res => god.tweens.push({t0: performance.now(), dur: Math.max(1, dur * 1000), fn, ease, res}));
+}
+const wait = s => tween(s, () => {});
+function stepGod(dt) {
+  const now = performance.now();
+  if (god.tweens.length) god.tweens = god.tweens.filter(tw => {
+    const k = god.abort ? 1 : Math.min(1, (now - tw.t0) / tw.dur);
+    tw.fn(tw.ease(k), k);
+    if (k >= 1) { tw.res(); return false; }
+    return true;
+  });
+  if (god.fx.length) god.fx = god.fx.filter(f => { const alive = f.update(dt); if (!alive) f.dispose(); return alive; });
+  if (!god.running && god.queue.length && now - god.lastTry > 400) { god.lastTry = now; tryStartGod(); }
+}
+
+function palmGeo() {
+  // superellipsoid palm: wide at the knuckles, narrower at the wrist, back of the hand gently domed
+  const g = new THREE.SphereGeometry(1, 48, 28), p = g.attributes.position;
+  const hx = .44, hy = .125, hz = .48, sp = (v, e) => Math.sign(v) * Math.pow(Math.abs(v), e);
+  for (let i = 0; i < p.count; i++) {
+    const nx = p.getX(i), ny = p.getY(i), nz = p.getZ(i);
+    let x = hx * sp(nx, .42), y = hy * sp(ny, .62), z = hz * sp(nz, .45);
+    const toWrist = clamp(z / hz, 0, 1), toKnuckle = clamp(-z / hz, 0, 1);
+    x *= 1 - .2 * toWrist;
+    y *= 1 - .18 * toKnuckle;
+    if (y > 0) y += .045 * (1 - Math.pow(x / hx, 2)) * (1 - .4 * toKnuckle);
+    else y -= .02 * (1 - Math.pow(x / hx, 2)) * toWrist;
+    p.setXYZ(i, x, y, z);
+  }
+  g.computeVertexNormals(); return g;
+}
+function makeHand() {
+  const group = new THREE.Group(), mats = [];
+  const skin = new THREE.MeshStandardMaterial({color: '#D9A07A', emissive: '#5A2A12', emissiveIntensity: .1, roughness: .64, metalness: 0, transparent: true});
+  const nailM = new THREE.MeshStandardMaterial({color: '#EFC3B0', emissive: '#6A3A2A', emissiveIntensity: .08, roughness: .22, metalness: .05, transparent: true});
+  const cloth = new THREE.MeshStandardMaterial({color: '#F3EEE4', emissive: '#6E6250', emissiveIntensity: .12, roughness: .92, metalness: 0, transparent: true, side: THREE.DoubleSide});
+  const gold = new THREE.MeshStandardMaterial({color: '#FFD27A', emissive: '#C88A1E', emissiveIntensity: .55, roughness: .3, metalness: .7, transparent: true});
+  const rim = rimMat('#FFD9A0', 3.0, .4);
+  const beamM = new THREE.MeshBasicMaterial({color: '#FFE7B0', transparent: true, opacity: .05, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide});
+  mats.push({m: skin, base: 1}, {m: nailM, base: 1}, {m: cloth, base: 1}, {m: gold, base: 1}, {m: rim, base: .4, rim: true}, {m: beamM, base: .05});
+  const mesh = (geo, mat, parent, x = 0, y = 0, z = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m; };
+  const blob = (parent, x, y, z, sx, sy, sz) => { const m = mesh(new THREE.SphereGeometry(1, 20, 14), skin, parent, x, y, z); m.scale.set(sx, sy, sz); return m; };
+
+  // palm, knuckles, palm pads
+  const palm = mesh(palmGeo(), skin, group);
+  mesh(palm.geometry, rim, palm).scale.setScalar(1.05);
+  blob(group, -.25, -.075, .12, .2, .1, .26);   // thenar pad (thumb side)
+  blob(group, .26, -.07, .16, .15, .085, .24);  // hypothenar pad
+
+  // fingers: right hand, palm down, fingers pointing along -z, thumb on -x
+  const W = [.46, .29, .25];
+  const finger = (x, y, z, len, rad, o = {}) => {
+    const joints = []; let parent = group, off = V3(x, y, z);
+    const props = o.props || W;
+    props.forEach((f, j) => {
+      const L = len * f, r0 = rad * (1 - j * .09), r1 = rad * (1 - (j + 1) * .09);
+      const piv = new THREE.Group(); piv.position.copy(off); piv.rotation.order = 'YXZ';
+      if (j === 0) { piv.rotation.set(o.pitch || 0, o.yaw || 0, o.roll || 0); piv.userData = {pitch: o.pitch || 0, yaw: o.yaw || 0}; }
+      parent.add(piv);
+      const jn = mesh(new THREE.SphereGeometry(r0, 18, 12), skin, piv); jn.scale.set(1, .9, 1);
+      const g = new THREE.CylinderGeometry(r1, r0, L, 18); g.rotateX(Math.PI / 2); g.translate(0, 0, -L / 2);
+      mesh(g, skin, piv).scale.y = .9;
+      if (j === props.length - 1) {
+        const tip = mesh(new THREE.SphereGeometry(r1, 18, 12), skin, piv, 0, 0, -L); tip.scale.set(1, .86, 1.18);
+        const nail = mesh(new THREE.SphereGeometry(1, 18, 10), nailM, piv, 0, r1 * .6, -L * .66); nail.scale.set(r1 * .8, r1 * .3, L * .44);
+      }
+      joints.push(piv); parent = piv; off = V3(0, 0, -L);
+    });
+    return joints;
+  };
+  const defs = [ // x, z, length, radius, spread
+    [-.31, -.455, .86, .083, -.08], // index
+    [-.1, -.48, .95, .087, -.02],   // middle
+    [.11, -.465, .88, .082, .05],   // ring
+    [.3, -.41, .7, .07, .14],       // pinky
+  ];
+  const fingers = defs.map(([x, z, len, r, yaw]) => {
+    blob(group, x, .07, z + .05, r * 1.15, r * .75, r * 1.1); // knuckle bump on the back of the hand
+    return finger(x, 0, z, len, r, {yaw, pitch: -.06});
+  });
+  blob(group, -.36, -.03, .16, .14, .11, .2); // thumb root
+  const thumb = finger(-.4, -.04, .14, .78, .1, {props: [.44, .3, .26], yaw: .85, pitch: -.13, roll: 1.0});
+
+  // wrist, forearm and a robe sleeve
+  const arm = new THREE.Group(); arm.position.set(0, .02, .42); arm.rotation.x = .55; group.add(arm);
+  const wrist = mesh(new THREE.CylinderGeometry(.24, .27, .55, 24), skin, arm, 0, .25, 0); wrist.scale.set(1.3, 1, .82);
+  const fore = mesh(new THREE.CylinderGeometry(.33, .25, 1.7, 24), skin, arm, 0, 1.3, 0); fore.scale.set(1.18, 1, .9);
+  mesh(new THREE.CylinderGeometry(.62, .45, 2.6, 32, 1, true), cloth, arm, 0, 2.95, 0);
+  const trim = mesh(new THREE.TorusGeometry(.455, .045, 10, 40), gold, arm, 0, 1.66, 0); trim.rotation.x = Math.PI / 2;
+  const trim2 = mesh(new THREE.TorusGeometry(.48, .022, 8, 40), gold, arm, 0, 1.8, 0); trim2.rotation.x = Math.PI / 2;
+  mesh(new THREE.CylinderGeometry(.75, 1.7, 10, 28, 1, true), beamM, arm, 0, 8.6, 0);
+
+  const glow = glowSprite('#FFD9A0', 2.2, .14); glow.position.set(0, .5, .3); group.add(glow); mats.push({m: glow.material, base: .14});
+  group.visible = false; scene.add(group);
+  return {group, fingers, thumb, mats};
+}
+function ensureHand() { if (!hand) hand = makeHand(); return hand; }
+function setCurl(c, thumbC = c * .8) {
+  const JW = [.8, 1.12, .78], FM = [1, 1.04, 1.1, 1.2];
+  hand.fingers.forEach((js, fi) => js.forEach((j, i) => {
+    j.rotation.x = (i === 0 ? j.userData.pitch : 0) - c * JW[i] * FM[fi];
+    if (i === 0) j.rotation.y = j.userData.yaw * (1 - Math.min(1, c) * .55);
+  }));
+  hand.thumb.forEach((j, i) => {
+    if (i === 0) { j.rotation.x = j.userData.pitch - thumbC * .3; j.rotation.y = j.userData.yaw - thumbC * .4; }
+    else j.rotation.x = -thumbC * .75;
+  });
+}
+function setHandOpacity(o) {
+  hand.mats.forEach(({m, base, rim: isRim}) => { if (isRim) m.uniforms.s.value = base * o; else m.opacity = base * o; });
+  hand.group.visible = o > .01;
+}
+function caption(text) { const c = $('godCap'); if (!text) { c.hidden = true; return; } c.textContent = text; c.hidden = false; }
+function planetWorld(info) { const v = V3(); info.pg.getWorldPosition(v); return v; }
+function towardCamera(p) { const d = camera.position.clone().sub(p); d.y = 0; if (d.lengthSq() < 1e-6) d.set(0, 0, 1); return d.normalize(); }
+function sparkle(pos, color = '#FFE7B0', size = 1.2, dur = .6) {
+  const s = glowSprite(color, .01, 1); s.position.copy(pos); scene.add(s); let t = 0;
+  god.fx.push({update: dt => { t += dt; const k = t / dur; s.scale.setScalar(size * Math.sin(Math.min(1, k) * Math.PI)); s.material.opacity = 1 - k * .6; return k < 1; }, dispose: () => { scene.remove(s); s.material.dispose(); }});
+}
+
+// --- queue ---
+function godPush(tasks) {
+  if (!renderer || reduceMotion || state.view !== 'system') return;
+  const now = performance.now();
+  tasks.slice(0, 8).forEach(t => { t.created = now; god.queue.push(t); });
+}
+function godAbort() { god.queue.length = 0; if (god.running) god.abort = true; }
+function taskReady(t) {
+  if (t.type === 'add') return planetInfo.has(t.cat) && t.ids.every(id => meshById.has(id));
+  if (t.type === 'remove') return planetInfo.has(t.cat) && !state.expenses.some(e => e.id === t.id);
+  if (t.type === 'reshape') return planetInfo.has(t.cat) && (!t.ids || t.ids.every(id => meshById.has(id)));
+  if (t.type === 'create') return planetInfo.has(t.cat);
+  if (t.type === 'crush') return !planetInfo.has(t.cat);
+  return false;
+}
+function tryStartGod() {
+  if (god.running || !god.queue.length) return;
+  if (!renderer || state.view !== 'system' || reduceMotion) { god.queue.length = 0; return; }
+  const now = performance.now();
+  while (god.queue.length && !taskReady(god.queue[0]) && now - god.queue[0].created > 7000) god.queue.shift();
+  const t = god.queue[0]; if (!t || !taskReady(t)) return;
+  god.queue.shift(); godRun(t);
+}
+async function godRun(t) {
+  god.running = true; ensureHand();
+  try { if (t.type === 'crush') await godCrush(t); else await godOnPlanet(t); }
+  catch (e) { console.warn('God hand', e); }
+  hand.group.visible = false; caption(null);
+  god.running = false; god.abort = false;
+  if (god.pendingRebuild) { const a = god.pendingAnimate; god.pendingRebuild = god.pendingAnimate = false; rebuildScene(a); }
+  else tryStartGod();
+}
+
+// --- scripts ---
+function placeHand(base, r) {
+  const hs = clamp(r * 3.4, 1.3, 3.1), f = towardCamera(base);
+  hand.group.scale.setScalar(hs); hand.group.rotation.set(0, Math.atan2(-f.x, -f.z), 0);
+  const contact = base.clone().add(V3(0, r + .15 * hs, 0));
+  return {hs, f, contact, above: contact.clone().add(V3(0, 7, 0))};
+}
+async function descend(P) {
+  setCurl(.15); setHandOpacity(0); hand.group.position.copy(P.above);
+  await tween(.9, k => { hand.group.position.lerpVectors(P.above, P.contact, k); setHandOpacity(Math.min(1, k * 2)); }, E.out);
+}
+async function ascend(P) {
+  const from = hand.group.position.clone();
+  await tween(.8, k => { hand.group.position.lerpVectors(from, P.above, k); setHandOpacity(1 - k); }, E.in);
+}
+async function godOnPlanet(t) {
+  const info = planetInfo.get(t.cat), pg = info.pg, name = catOf(t.cat).name;
+  const base = planetWorld(info), P = placeHand(base, info.r);
+  const texts = {add: `Bàn tay của God · thêm ${t.ids ? t.ids.length : 1} tiểu hành tinh vào ${name}`, remove: `Bàn tay của God · gỡ một tiểu hành tinh khỏi ${name}`, reshape: `Bàn tay của God · nặn lại hành tinh ${name}`, create: `Bàn tay của God · nặn ra hành tinh ${name}`};
+  caption(texts[t.type]);
+  const hidden = [];
+  if (t.type === 'add') t.ids.forEach(id => { const m = meshById.get(id); if (m) { hidden.push(m); m.scale.setScalar(.001); } });
+  if (t.type === 'create') pg.scale.setScalar(.001);
+  await descend(P);
+  if (t.type === 'create') { await mold(info, P); await ascend(P); return; }
+  await tween(.35, k => setCurl(.15 + .85 * k));
+  const lift = 1.4, y0 = pg.position.y, hy = P.contact.y;
+  await tween(.8, k => { pg.position.y = y0 + lift * k; hand.group.position.y = hy + lift * k; });
+  const lifted = base.clone().add(V3(0, lift, 0));
+  if (t.type === 'add') {
+    for (const m of hidden) {
+      const s = m.userData.s || .08, wp = V3(); m.getWorldPosition(wp);
+      sparkle(wp, catOf(t.cat).color, 1.1, .7);
+      await tween(.55, (k, raw) => { m.scale.setScalar(Math.max(.001, s * E.back(raw))); setCurl(1 + .28 * Math.sin(raw * Math.PI)); }, E.lin);
+    }
+  } else if (t.type === 'remove') {
+    const g = new THREE.Mesh(unitRock, glowMat(catOf(t.cat).color, .45)); g.scale.setScalar(t.size || .08);
+    const start = lifted.clone().add(P.f.clone().multiplyScalar(info.ringR)); g.position.copy(start); scene.add(g);
+    const tip = () => hand.group.position.clone().add(P.f.clone().multiplyScalar(.85 * P.hs)).add(V3(0, -.15 * P.hs, 0));
+    await tween(.5, k => { g.position.lerpVectors(start, tip(), k); setCurl(1 + .3 * k); g.rotation.y += .1; });
+    const from = g.position.clone(), to = from.clone().add(V3(0, 2.6, 0)).add(P.f.clone().multiplyScalar(-1.2));
+    sparkle(from, '#FFFFFF', .9, .5);
+    await tween(.7, k => { g.position.lerpVectors(from, to, k); g.scale.setScalar(Math.max(.001, (t.size || .08) * (1 - k))); setCurl(1.3 - .3 * k); }, E.in);
+    scene.remove(g); g.material.dispose();
+  } else if (t.type === 'reshape') {
+    const r0 = t.oldR ? clamp(t.oldR / info.r, .4, 2.5) : 1;
+    const rocks = (t.ids || []).map(id => meshById.get(id)).filter(Boolean);
+    sparkle(lifted, catOf(t.cat).color, info.r * 4, 1.4);
+    await tween(1.5, (k, raw) => {
+      const s = r0 + (1 - r0) * E.inOut(raw), w = Math.sin(raw * Math.PI * 4) * .22 * (1 - raw);
+      pg.scale.set(s * (1 + w), s * (1 - w), s * (1 + w));
+      setCurl(1 + .35 * Math.abs(Math.sin(raw * Math.PI * 4)) * (1 - raw * .5));
+      rocks.forEach(m => setGlow(m, Math.sin(raw * Math.PI * 6) > 0 ? 'select' : 'base'));
+    }, E.lin);
+    pg.scale.setScalar(1); rocks.forEach(m => setGlow(m, m.userData.id === state.selectedId ? 'select' : 'base'));
+  }
+  await tween(.8, k => { pg.position.y = y0 + lift * (1 - k); hand.group.position.y = hy + lift * (1 - k); });
+  pg.position.y = y0;
+  await tween(.3, k => setCurl(1 - .85 * k));
+  await ascend(P);
+}
+async function mold(info, P) {
+  const base = planetWorld(info), col = new THREE.Color(catOf(info.cat).color);
+  const n = 220, pos = new Float32Array(n * 3), colors = new Float32Array(n * 3), start = [];
+  for (let i = 0; i < n; i++) {
+    const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u), r = 2 + Math.random() * 1.8;
+    start.push([Math.cos(th) * s * r, u * r * .6, Math.sin(th) * s * r]);
+    const c = i % 3 ? col : new THREE.Color('#FFF2D0'); colors.set([c.r, c.g, c.b], i * 3);
+  }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const pts = new THREE.Points(geo, new THREE.PointsMaterial({size: .22, map: glowTex(), vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending}));
+  pts.position.copy(base); scene.add(pts);
+  const hy = P.contact.y;
+  await tween(1.9, (k, raw) => {
+    const a = (1 - raw) * 3.2, ca = Math.cos(a), sa = Math.sin(a), shrink = 1 - E.inOut(raw);
+    for (let i = 0; i < n; i++) { const [x, y, z] = start[i]; pos[i * 3] = (x * ca - z * sa) * shrink; pos[i * 3 + 1] = y * shrink; pos[i * 3 + 2] = (x * sa + z * ca) * shrink; }
+    geo.attributes.position.needsUpdate = true;
+    const g = clamp((raw - .3) / .7, 0, 1), w = Math.sin(raw * Math.PI * 5) * .18 * (1 - raw);
+    info.pg.scale.set(Math.max(.001, E.back(g) * (1 + w)), Math.max(.001, E.back(g) * (1 - w)), Math.max(.001, E.back(g) * (1 + w)));
+    hand.group.rotation.z = Math.sin(raw * Math.PI * 5) * .14 * (1 - raw);
+    hand.group.position.y = hy + .7 * (1 - raw);
+    setCurl(.4 + .35 * Math.abs(Math.sin(raw * Math.PI * 5)));
+  }, E.lin);
+  info.pg.scale.setScalar(1); hand.group.rotation.z = 0;
+  scene.remove(pts); geo.dispose(); pts.material.dispose();
+  sparkle(base, catOf(info.cat).color, info.r * 6, .9);
+  await tween(.3, k => setCurl(.75 - .6 * k));
+}
+async function godCrush(t) {
+  caption(`Bàn tay của God · bóp nát hành tinh ${t.name}`);
+  const ghost = new THREE.Group(); ghost.position.copy(t.pos); scene.add(ghost);
+  const pm = new THREE.MeshStandardMaterial({map: bandTex(t.color), roughness: .6, emissive: t.color, emissiveIntensity: .2});
+  const planet = new THREE.Mesh(unitSphere, pm); planet.scale.setScalar(t.r); ghost.add(planet);
+  const belt = new THREE.Group(); belt.rotation.x = .4; ghost.add(belt);
+  const rockM = glowMat(t.color, .35), nR = Math.min(28, t.rocks || 0);
+  for (let i = 0; i < nR; i++) { const a = i / nR * Math.PI * 2, m = new THREE.Mesh(unitRock, rockM); m.scale.setScalar(.05 + (i % 3) * .025); m.position.set(Math.cos(a) * t.ringR, 0, Math.sin(a) * t.ringR); belt.add(m); }
+  const near = [...planetInfo.values()].filter(i => planetWorld(i).distanceTo(t.pos) < Math.max(1.8, t.r * 2.6));
+  near.forEach(i => i.pg.scale.setScalar(.001));
+  const P = placeHand(t.pos, t.r);
+  await descend(P);
+  await tween(.35, k => setCurl(.15 + .85 * k));
+  await tween(1.1, (k, raw) => {
+    setCurl(1 + .55 * raw);
+    planet.scale.set(t.r * (1 - .3 * raw), t.r * (1 - .5 * raw), t.r * (1 - .3 * raw));
+    pm.emissiveIntensity = .2 + 1.6 * raw;
+    ghost.position.set(t.pos.x + (Math.random() - .5) * .12 * raw, t.pos.y + (Math.random() - .5) * .12 * raw, t.pos.z + (Math.random() - .5) * .12 * raw);
+    belt.scale.setScalar(1 - .45 * raw);
+    hand.group.position.y = P.contact.y - .25 * t.r * raw;
+  }, E.in);
+  shatter(t.pos.clone(), t.color, t.r, nR);
+  scene.remove(ghost); pm.dispose(); rockM.dispose();
+  await tween(.25, k => setCurl(1.55 - 1.4 * k), E.out);
+  await wait(.5);
+  const up = ascend(P);
+  if (near.length) await tween(.8, (k, raw) => near.forEach(i => i.pg.scale.setScalar(Math.max(.001, E.back(raw)))), E.lin);
+  await up;
+}
+function shatter(center, color, r, extra) {
+  const flash = glowSprite('#FFF4D6', .01, 1); flash.position.copy(center); scene.add(flash);
+  const flash2 = glowSprite(color, .01, .9); flash2.position.copy(center); scene.add(flash2);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1, .04, 8, 64), new THREE.MeshBasicMaterial({color, transparent: true, opacity: .9, blending: THREE.AdditiveBlending, depthWrite: false}));
+  ring.position.copy(center); ring.rotation.x = Math.PI / 2; scene.add(ring);
+  const shades = [new THREE.Color(color), mix(color, '#000000', .3), mix(color, '#ffffff', .3), new THREE.Color('#FFD9A0')];
+  const frags = [];
+  const n = 70 + extra;
+  for (let i = 0; i < n; i++) {
+    const m = new THREE.Mesh(unitRock, new THREE.MeshStandardMaterial({color: shades[i % 4], emissive: shades[i % 4], emissiveIntensity: .5, flatShading: true, transparent: true}));
+    const d = V3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
+    m.position.copy(center).add(d.clone().multiplyScalar(r * Math.random() * .8));
+    m.scale.setScalar((.03 + Math.random() * .12) * clamp(r * 1.6, .6, 1.6));
+    scene.add(m);
+    frags.push({m, v: d.multiplyScalar(1.5 + Math.random() * 3.5), w: V3(Math.random() * 6, Math.random() * 6, Math.random() * 6)});
+  }
+  let t = 0; const dur = 2.2;
+  god.fx.push({
+    update: dt => {
+      t += dt; const k = t / dur;
+      flash.scale.setScalar(r * 9 * Math.min(1, t / .18)); flash.material.opacity = Math.max(0, 1 - t / .55);
+      flash2.scale.setScalar(r * 14 * Math.min(1, t / .3)); flash2.material.opacity = Math.max(0, .9 - t / .8);
+      ring.scale.setScalar(.2 + t * 5.5); ring.material.opacity = Math.max(0, .9 - t / 1.1);
+      frags.forEach(f => { f.m.position.addScaledVector(f.v, dt); f.v.multiplyScalar(1 - dt * .55); f.m.rotation.x += f.w.x * dt; f.m.rotation.y += f.w.y * dt; f.m.material.opacity = k < .55 ? 1 : Math.max(0, 1 - (k - .55) / .45); });
+      return k < 1;
+    },
+    dispose: () => {
+      [flash, flash2].forEach(s => { scene.remove(s); s.material.dispose(); });
+      scene.remove(ring); ring.geometry.dispose(); ring.material.dispose();
+      frags.forEach(f => { scene.remove(f.m); f.m.material.dispose(); });
+    },
+  });
+}
+// snapshots of the current scene, taken before a change is saved
+function capturePlanet(catId) {
+  const info = planetInfo.get(catId); if (!info) return null;
+  return {pos: planetWorld(info), r: info.r, ringR: info.ringR, rocks: info.belt.children.length, color: catOf(catId).color, name: catOf(catId).name};
+}
+const curR = catId => { const i = planetInfo.get(catId); return i ? i.r : null; };
+const rockSize = id => { const m = meshById.get(id); return m ? (m.userData.s || .08) : .08; };
+
+function setView(v) {
+  if (state.view === v) return;
+  godAbort();
+  state.view = v;
+  $('viewSystem').setAttribute('aria-pressed', v === 'system'); $('viewCal').setAttribute('aria-pressed', v === 'calendar');
+  rebuildScene(true);
+}
+$('viewSystem').onclick = () => setView('system');
+$('viewCal').onclick = () => setView('calendar');
+
+try { initScene(); }
+catch (e) { renderer = null; canvas.hidden = true; const d = document.createElement('div'); d.className = 'nogl'; d.textContent = 'Trình duyệt này không hiển thị được mô hình 3D (WebGL). Bạn vẫn quản lý chi tiêu được ở bảng bên cạnh.'; stage.appendChild(d); }
+
+const mq = matchMedia('(prefers-color-scheme: dark)');
+(mq.addEventListener ? mq.addEventListener('change', () => applyTheme()) : mq.addListener(() => applyTheme()));
+new MutationObserver(() => applyTheme()).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => rebuildScene(false));
+
+refresh();
+initStore();
+})();
+</script>
