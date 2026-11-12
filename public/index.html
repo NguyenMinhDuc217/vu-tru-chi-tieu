@@ -200,14 +200,75 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 12px 10px 16px;border-radius:10px;box-shadow:var(--shadow);font-weight:500;z-index:20;max-width:calc(100% - 32px);display:flex;align-items:center;gap:14px}
 .toast button{border:0;background:none;color:var(--accent-soft);font-weight:700;cursor:pointer;padding:4px 6px;border-radius:6px;text-decoration:underline;text-underline-offset:3px}
 
+.howto summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);width:fit-content}
+.howto summary:hover{color:var(--fg)}
+.howto p{margin:8px 0 0}
+
+/* Phones and small tablets: 3D on top, ledger below, everything sized for thumbs */
 @media (max-width:860px){
   html,body{height:auto}
   .app{display:block;height:auto}
-  .stage{height:60svh;min-height:360px}
-  .panel{border-left:0;border-top:1px solid var(--line);overflow:visible;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .stage{height:58svh;min-height:340px;max-height:640px}
+  .stage-head{gap:8px;padding-top:max(12px,env(safe-area-inset-top,0px))}
+  .brand h1{font-size:21px}
+  .mode{font-size:11px;margin-top:6px;padding:2px 9px 2px 7px}
+  .seg button{padding:7px 10px;font-size:12.5px}
+  .stage-foot{flex-wrap:nowrap;align-items:center;padding-bottom:10px}
+  .stage-foot .row-actions{flex:none}
+  .stage-foot .btn.small{padding:7px 10px;font-size:12px}
+  /* legend: one swipeable line instead of a block that covers the planets */
+  .legend{flex:1 1 auto;min-width:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:6px 0;max-width:none;
+    -webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+  .legend::-webkit-scrollbar{display:none}
   .hint{display:none}
+  .lbl{font-size:10.5px;padding:2px 6px 3px;border-radius:6px}
+  .lbl b{font-size:11px}
+  .god-cap{top:auto;bottom:58px;font-size:12px}
+
+  .panel{border-left:0;border-top:1px solid var(--line);overflow:visible;gap:16px;
+    padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+    padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+  .month{grid-template-columns:44px 1fr 44px}
+  .iconbtn{width:44px;height:44px}
+  /* tabs stay reachable while scrolling a long list */
+  .tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--panel);
+    margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));
+    padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .tabs button{flex:1;padding:12px;font-size:14.5px}
+  /* primary action floats at the thumb */
+  #addBtn{position:fixed;z-index:15;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));
+    border-radius:999px;padding:14px 20px;font-size:15px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+
+  /* 16px inputs: iOS stops zooming the page when a field gets focus */
+  .panel input,.panel select,.panel textarea,.line .line-note,.brow .bamt{font-size:16px}
+  .btn{padding:11px 16px;font-size:14px}
+  .btn.small{padding:8px 12px;font-size:13px}
+  .chip{padding:4px 5px 4px 12px}
+  .chip button{width:28px;height:28px;font-size:15px}
+  .line{padding:10px;gap:8px}
+  .line input,.line select{padding:9px 10px}
+  .line-top{grid-template-columns:20px minmax(0,1fr) 38px}
+  .line .del{width:38px;height:38px}
+  .item{padding:11px 6px}
+  .item-row{grid-template-columns:minmax(0,1fr) 42px}
+  .del{width:42px;height:42px}
+
+  /* budget rows: name and meta on top, full-width amount below, bigger reorder buttons */
+  .brow{grid-template-columns:26px minmax(0,1fr) 38px 38px;column-gap:10px;row-gap:8px;padding:12px 0}
+  .brow .mv{order:1;grid-row:span 2;gap:6px}
+  .brow>:last-child{order:2;grid-row:span 2}
+  .brow .bamt{order:3;grid-column:2;padding:9px 10px}
+  .mv button{width:38px;height:30px}
+  .mv svg{width:13px;height:13px}
+  .swatch{width:26px;height:26px;border-radius:7px}
+  .brow .del{width:38px;height:38px}
+  .sortbar select{padding:9px 10px}
 }
-@media (max-width:420px){ .seg button{padding:7px 9px} }
+@media (max-width:420px){
+  .seg button{padding:7px 9px;font-size:12px}
+  .brand h1{font-size:19px}
+}
 @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
 </style>
 
@@ -291,7 +352,7 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
     </section>
 
     <section id="tabBudget" class="stack" role="tabpanel" hidden>
-      <p class="note">Dùng mũi tên ▲▼ hoặc ô Sắp xếp để đổi thứ tự. Trong hệ hành tinh, mỗi vòng quỹ đạo chứa 5 mục theo đúng thứ tự này, 5 mục đầu ở vòng gần ngôi sao nhất. Bấm vào tên mục để đổi tên, bấm ô màu để đổi màu, hoặc thêm mục mới. Mục chưa có khoản chi nào có thể xóa. Đặt mức chi tối đa cho từng mục. Trong vũ trụ, lớp khí quyển mờ quanh mỗi hành tinh là ngân sách của danh mục đó. Hành tinh to vượt khỏi lớp khí quyển (chuyển đỏ) nghĩa là đã chi vượt. Ngôi sao ở giữa đổi từ vàng sang đỏ khi tổng chi gần chạm ngân sách. Ngân sách áp dụng cho mọi tháng.</p>
+      <details class="howto" id="budgetHelp"><summary>Cách dùng tab Ngân sách</summary><p class="note">Dùng mũi tên ▲▼ hoặc ô Sắp xếp để đổi thứ tự. Trong hệ hành tinh, mỗi vòng quỹ đạo chứa 5 mục theo đúng thứ tự này, 5 mục đầu ở vòng gần ngôi sao nhất. Bấm vào tên mục để đổi tên, bấm ô màu để đổi màu, hoặc thêm mục mới. Mục chưa có khoản chi nào có thể xóa. Đặt mức chi tối đa cho từng mục. Trong vũ trụ, lớp khí quyển mờ quanh mỗi hành tinh là ngân sách của danh mục đó. Hành tinh to vượt khỏi lớp khí quyển (chuyển đỏ) nghĩa là đã chi vượt. Ngôi sao ở giữa đổi từ vàng sang đỏ khi tổng chi gần chạm ngân sách. Ngân sách áp dụng cho mọi tháng.</p></details>
       <div class="sortbar">
         <label class="eyebrow" for="sortCats">Sắp xếp</label>
         <select id="sortCats">
@@ -921,6 +982,7 @@ $('prevM').onclick = () => shiftMonth(-1);
 $('nextM').onclick = () => shiftMonth(1);
 
 renderLegend();
+if (matchMedia('(min-width: 861px)').matches) $('budgetHelp').open = true;
 
 // ---------- 3D scene: Vũ trụ chi tiêu ----------
 const stage = $('stage'), canvas = $('scene'), labelsEl = $('labels'), tip = $('tooltip');
@@ -1303,13 +1365,28 @@ function bindPointer() {
   $('resetCam').onclick = () => fitCamera();
 }
 const _v = typeof THREE !== 'undefined' ? new THREE.Vector3() : null;
+// On narrow stages labels pile on top of each other, so there we drop the ones that would
+// overlap a more important label (the star, the filtered planet, then the nearest planets).
+const labelRank = l => { const k = l.el.dataset.key; return k === 'total' ? 3 : state.filter.cat && k === 'cat:' + state.filter.cat ? 4 : l.el.classList.contains('dim') ? -1 : 0; };
 function updateLabels() {
-  const w = stage.clientWidth, h = stage.clientHeight;
+  const w = stage.clientWidth, h = stage.clientHeight, crowded = w < 640;
+  const shown = [];
   for (const l of labels) {
     l.a.getWorldPosition(_v); _v.project(camera);
     if (_v.z > 1) { l.el.style.visibility = 'hidden'; continue; }
+    shown.push({l, x: (_v.x + 1) / 2 * w, y: (1 - _v.y) / 2 * h, z: _v.z});
+  }
+  if (crowded) shown.sort((a, b) => labelRank(b.l) - labelRank(a.l) || a.z - b.z);
+  const boxes = [];
+  for (const {l, x, y} of shown) {
+    l.el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%)`;
+    if (crowded) {
+      if (!l.w) { l.w = l.el.offsetWidth; l.h = l.el.offsetHeight; }
+      const r = [x - l.w / 2 - 2, y - l.h - 2, x + l.w / 2 + 2, y + 2];
+      if (boxes.some(o => r[0] < o[2] && r[2] > o[0] && r[1] < o[3] && r[3] > o[1])) { l.el.style.visibility = 'hidden'; continue; }
+      boxes.push(r);
+    }
     l.el.style.visibility = '';
-    l.el.style.transform = `translate(${(_v.x + 1) / 2 * w}px, ${(1 - _v.y) / 2 * h}px) translate(-50%, -100%)`;
   }
 }
 let lastT = performance.now();
