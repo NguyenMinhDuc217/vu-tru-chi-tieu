@@ -1,11 +1,42 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Vũ Trụ Chi Tiêu: each signed-in user owns everything under vutru_chitieu/<their uid>/.
+    // Vũ Trụ Chi Tiêu
+    // - vutru_chitieu/<uid>               hồ sơ người dùng (tên, email, lần mở app, blocked)
+    // - vutru_chitieu/<uid>/expenses/...   khoản chi
+    // - vutru_chitieu/<uid>/settings/main  ngân sách và danh mục
+    // Mỗi người chỉ đọc/ghi dữ liệu của mình. Tài khoản quản trị xem được mọi người dùng
+    // (chỉ xem, không sửa chi tiêu của họ) và khóa / mở khóa tài khoản.
+    //
+    // Repo này công khai nên email quản trị không ghi ở đây: khi dán vào Firebase Console,
+    // thay EMAIL_QUAN_TRI bằng email Google của tài khoản quản trị.
+    //
     // This project (python-chat-7e32a) is shared with another app: keep that app's own
-    // match blocks next to this one instead of replacing them.
-    match /vutru_chitieu/{uid}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+    // match blocks next to these instead of replacing them.
+    function isVtctAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'EMAIL_QUAN_TRI'
+        && request.auth.token.email_verified == true;
+    }
+    function isVtctOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+    function vtctNotBlocked(uid) {
+      let p = /databases/$(database)/documents/vutru_chitieu/$(uid);
+      return !exists(p) || get(p).data.get('blocked', false) != true;
+    }
+
+    match /vutru_chitieu/{uid} {
+      allow read: if isVtctAdmin() || isVtctOwner(uid);
+      // người dùng tự cập nhật hồ sơ nhưng không tự gỡ khóa được
+      allow create: if isVtctOwner(uid) && !request.resource.data.keys().hasAny(['blocked', 'blockedAt']);
+      allow update: if isVtctAdmin()
+        || (isVtctOwner(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['blocked', 'blockedAt']));
+    }
+
+    match /vutru_chitieu/{uid}/{sub}/{document=**} {
+      allow read: if isVtctAdmin() || (isVtctOwner(uid) && vtctNotBlocked(uid));
+      allow write: if isVtctOwner(uid) && vtctNotBlocked(uid);
     }
   }
 }

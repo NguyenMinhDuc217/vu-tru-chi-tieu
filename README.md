@@ -48,6 +48,18 @@ Mỗi lần `git push` lên nhánh `main`, Cloudflare tự build và cập nhậ
 4. **Firestore Database:** tạo database (production mode). Trong tab **Rules**, thêm khối `match /vutru_chitieu/...` từ `firestore.rules` (giữ nguyên các khối của app khác nếu dự án dùng chung) rồi **Publish**
 5. **Project settings → Your apps → Web app:** sao chép `firebaseConfig` vào `firebase-config.js`, chạy `./build.sh`, commit và push
 
+## Trang quản trị
+
+Tài khoản quản trị thấy nút **Quản trị** trong ô tài khoản. Trang quản trị có:
+
+- Danh sách người dùng (tên, email, lần mở app gần nhất, chi tiêu tháng này), tìm theo tên hoặc email
+- **Xem chi tiêu:** mở toàn bộ dữ liệu của người đó (vũ trụ 3D, danh sách, ngân sách) ở chế độ chỉ xem
+- **Khóa / Mở khóa:** tài khoản bị khóa không đọc, ghi được dữ liệu của mình trên máy chủ
+
+Ai là quản trị viên do `firestore.rules` quyết định (hàm `isVtctAdmin`), app không ghi email đó trong mã nguồn.
+Khi dán rules vào Firebase Console, thay `EMAIL_QUAN_TRI` bằng email Google của quản trị viên.
+Người dùng chỉ hiện trong danh sách sau khi mở app (đã đăng nhập) ít nhất một lần, vì lúc đó app mới tạo hồ sơ `vutru_chitieu/<uid>`.
+
 ## Cập nhật ứng dụng
 
 1. Sửa `thap-chi-tieu.html`

@@ -200,6 +200,39 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 12px 10px 16px;border-radius:10px;box-shadow:var(--shadow);font-weight:500;z-index:20;max-width:calc(100% - 32px);display:flex;align-items:center;gap:14px}
 .toast button{border:0;background:none;color:var(--accent-soft);font-weight:700;cursor:pointer;padding:4px 6px;border-radius:6px;text-decoration:underline;text-underline-offset:3px}
 
+.banner.view{background:var(--accent-soft)}
+.banner.blocked{background:var(--danger-soft);color:var(--danger);font-weight:500}
+.ro #addBtn,.ro #clearSamples,.ro .sortbar,.ro #addCat,.ro #saveBudget,.ro #budgetHelp{display:none}
+.ro .brow .mv,.ro .brow .del{visibility:hidden}
+.ro .bname:disabled,.ro .bamt:disabled{color:var(--fg);opacity:1;background:transparent;border-color:transparent}
+.ro .swatch,.ro .swatch input{cursor:default}
+.tag.ok{color:var(--ok)} .tag.bad{color:var(--danger)}
+
+/* Admin page: a full-screen sheet over the app */
+.modal-open,.modal-open body{overflow:hidden}
+.admin{position:fixed;inset:0;z-index:30;background:rgba(8,6,24,.6);overflow-y:auto;overscroll-behavior:contain;
+  padding:max(24px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(24px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.admin-box{width:min(960px,100%);margin:0 auto;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px;display:grid;gap:16px}
+.admin-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.admin-head h2{margin:2px 0 0;font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:-.03em}
+.admin-head .row-actions{align-items:center;flex-wrap:nowrap}
+.admin-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.akpi{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.admin-search{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px}
+.admin-search:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.admin-list{display:grid;gap:8px}
+.urow{display:grid;grid-template-columns:40px minmax(0,1fr) minmax(150px,auto) auto;grid-template-areas:"av info stats act";gap:8px 14px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.urow.blocked{border-style:dashed;border-color:var(--danger)}
+.urow .av{grid-area:av;width:40px;height:40px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700;overflow:hidden}
+.urow .av img{width:100%;height:100%;object-fit:cover}
+.uinfo{grid-area:info;min-width:0}
+.uinfo>b{display:block;overflow-wrap:anywhere}
+.uinfo .em{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.uinfo .seen{font-size:11.5px;color:var(--muted);margin-top:2px}
+.ustats{grid-area:stats;text-align:right;font-size:12px;color:var(--muted)}
+.ustats b{display:block;font-family:var(--f-num);font-size:15px;color:var(--fg)}
+.uact{grid-area:act;display:flex;gap:6px;justify-content:flex-end}
+
 .howto summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);width:fit-content}
 .howto summary:hover{color:var(--fg)}
 .howto p{margin:8px 0 0}
@@ -264,6 +297,18 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
   .swatch{width:26px;height:26px;border-radius:7px}
   .brow .del{width:38px;height:38px}
   .sortbar select{padding:9px 10px}
+  .admin{padding:0;background:var(--panel)}
+  .admin-box{min-height:100%;border:0;border-radius:0;box-shadow:none;
+    padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+  .admin-head h2{font-size:22px}
+  .admin-kpis{grid-template-columns:1fr 1fr}
+  .admin-search{font-size:16px}
+}
+@media (max-width:640px){
+  .urow{grid-template-columns:40px minmax(0,1fr);grid-template-areas:"av info" ". stats" ". act"}
+  .ustats{text-align:left}
+  .uact{justify-content:flex-start}
+  .uact .btn{flex:1}
 }
 @media (max-width:420px){
   .seg button{padding:7px 9px;font-size:12px}
@@ -308,6 +353,13 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
     <div class="banner" id="sampleBanner" hidden>
       <span>Đang có <b id="sampleCount">0</b> khoản chi mẫu để bạn xem thử.</span>
       <button class="btn small danger" id="clearSamples">Xóa dữ liệu mẫu</button>
+    </div>
+    <div class="banner view" id="viewBanner" hidden>
+      <span id="viewText"></span>
+      <span class="row-actions"><button class="btn small" id="viewUsers">Danh sách người dùng</button><button class="btn small primary" id="viewExit">Về dữ liệu của tôi</button></span>
+    </div>
+    <div class="banner blocked" id="blockBanner" hidden>
+      <span>Tài khoản của bạn đang bị quản trị viên khóa. Dữ liệu trên máy chủ tạm thời không dùng được; app đang lưu trên trình duyệt này.</span>
     </div>
     <div class="banner sync" id="syncBanner" hidden>
       <span id="syncText"></span>
@@ -368,6 +420,18 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
       <div class="row-actions"><button class="btn" id="addCat">+ Thêm mục ngân sách</button><button class="btn primary" id="saveBudget">Lưu thay đổi</button></div>
     </section>
   </aside>
+</div>
+<div class="admin" id="admin" role="dialog" aria-modal="true" aria-labelledby="adminTitle" hidden>
+  <div class="admin-box">
+    <header class="admin-head">
+      <div><div class="eyebrow">Trang quản trị</div><h2 id="adminTitle">Người dùng</h2></div>
+      <div class="row-actions"><button class="btn small" type="button" id="adminReload">Tải lại</button><button class="iconbtn" type="button" id="adminClose" aria-label="Đóng trang quản trị">×</button></div>
+    </header>
+    <div class="admin-kpis" id="adminKpis"></div>
+    <input class="admin-search" id="adminSearch" type="search" placeholder="Tìm theo tên hoặc email" aria-label="Tìm người dùng" autocomplete="off">
+    <div class="admin-list" id="adminList"></div>
+    <p class="note">Người dùng hiện ở đây sau khi mở app và đăng nhập. “Xem chi tiêu” mở toàn bộ dữ liệu của người đó ở chế độ chỉ xem. Tài khoản bị khóa không đọc, ghi được dữ liệu của mình trên máy chủ cho đến khi được mở khóa.</p>
+  </div>
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
 
@@ -457,7 +521,7 @@ const state = {
   y: today.getFullYear(), m: today.getMonth() + 1,
   view: 'system', filter: {cat: null, day: null},
   editingId: null, selectedId: null,
-  expenses: [], budgets: {}, ready: false, mode: null, readOnly: false,
+  expenses: [], budgets: {}, ready: false, mode: null, readOnly: false, viewing: null,
 };
 let api = null;
 let animateNext = true;
@@ -555,7 +619,22 @@ function startRemote(db, prefix, label, onFirstSync) {
 function startCloud(db) { startRemote(db, '', 'Đồng bộ trên claude.ai'); }
 
 // ----- Firebase (public site): sign in with Google, data under vutru_chitieu/<uid>/ -----
-let fb = null;
+// Each signed-in user also keeps a profile doc vutru_chitieu/<uid> (name, email, last seen) so the
+// admin can list users. Who is admin is decided only by firestore.rules: the app finds out by trying
+// to list the profiles, which the rules allow for the admin account alone.
+let fb = null, me = null, amAdmin = false, myBlocked = false, profileUnsub = null;
+const serverNow = () => firebase.firestore.FieldValue.serverTimestamp();
+function startOwnData() {
+  if (!me) return startLocal();
+  if (myBlocked) return startLocal('Tài khoản bị khóa · lưu trên trình duyệt');
+  const name = me.displayName || me.email || 'tài khoản Google', user = me;
+  startRemote(fb.fdb, `vutru_chitieu/${user.uid}/`, 'Đồng bộ · ' + name, cloud => offerUpload(user, cloud));
+}
+function touchProfile(user) {
+  const ref = fb.fdb.doc('vutru_chitieu/' + user.uid);
+  const data = {name: user.displayName || '', email: user.email || '', photo: user.photoURL || '', lastSeen: serverNow()};
+  ref.get({source: 'server'}).then(s => ref.set(s.exists ? data : {...data, firstSeen: serverNow()}, {merge: true})).catch(e => console.warn('profile', e));
+}
 function startFirebase() {
   const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(window.FIREBASE_CONFIG);
   const auth = firebase.auth(app), fdb = firebase.firestore(app);
@@ -566,11 +645,23 @@ function startFirebase() {
   startLocal();
   auth.getRedirectResult().catch(e => toast(authError(e)));
   auth.onAuthStateChanged(user => {
-    renderAccount(user || null);
-    hideSyncBanner();
+    if (profileUnsub) { profileUnsub(); profileUnsub = null; }
+    me = user || null; amAdmin = false; myBlocked = false;
+    leaveView(false); closeAdmin();
+    renderAccount(me);
+    hideSyncBanner(); $('blockBanner').hidden = true;
     if (!user) { startLocal(); return; }
-    const name = user.displayName || user.email || 'tài khoản Google';
-    startRemote(fdb, `vutru_chitieu/${user.uid}/`, 'Đồng bộ · ' + name, cloud => offerUpload(user, cloud));
+    touchProfile(user);
+    startOwnData();
+    profileUnsub = fdb.doc('vutru_chitieu/' + user.uid).onSnapshot(s => {
+      const blocked = !!(s.exists && s.data().blocked === true);
+      if (blocked === myBlocked) return;
+      myBlocked = blocked; $('blockBanner').hidden = !blocked;
+      if (!state.viewing) startOwnData();
+    }, () => {});
+    fdb.collection('vutru_chitieu').limit(1).get({source: 'server'})
+      .then(() => { if (me === user) { amAdmin = true; renderAccount(me); } })
+      .catch(() => {});
   });
 }
 function authError(e) {
@@ -597,13 +688,130 @@ function renderAccount(user) {
     return;
   }
   const name = esc(user.displayName || user.email || 'Tài khoản Google');
-  el.innerHTML = `<span class="acc-user">${user.photoURL ? `<img class="avatar" src="${esc(user.photoURL)}" alt="" referrerpolicy="no-referrer">` : ''}<span><b>${name}</b><small>Đã đồng bộ trên mọi thiết bị</small></span></span><button class="btn small" type="button" data-acc="out">Đăng xuất</button>`;
+  el.innerHTML = `<span class="acc-user">${user.photoURL ? `<img class="avatar" src="${esc(user.photoURL)}" alt="" referrerpolicy="no-referrer">` : ''}<span><b>${name}</b><small>${amAdmin ? 'Quản trị viên · ' : ''}Đã đồng bộ trên mọi thiết bị</small></span></span><span class="row-actions">${amAdmin ? '<button class="btn small primary" type="button" data-acc="admin">Quản trị</button>' : ''}<button class="btn small" type="button" data-acc="out">Đăng xuất</button></span>`;
 }
 $('account').addEventListener('click', async e => {
   const b = e.target.closest('[data-acc]'); if (!b || !fb) return;
   if (b.dataset.acc === 'in') signIn();
+  else if (b.dataset.acc === 'admin') openAdmin();
   else { try { await fb.auth.signOut(); toast('Đã đăng xuất. App quay về dữ liệu trên trình duyệt này.'); } catch (err) { toast('Không đăng xuất được.'); } }
 });
+
+// ----- Admin: list users, see their spending (read-only), lock / unlock -----
+let adminUsers = null, adminLoadSeq = 0;
+const tsMs = t => (t && typeof t.toMillis === 'function') ? t.toMillis() : 0;
+function ago(ms) {
+  if (!ms) return 'chưa rõ';
+  const s = (Date.now() - ms) / 1000;
+  if (s < 60) return 'vừa xong';
+  if (s < 3600) return Math.floor(s / 60) + ' phút trước';
+  if (s < 86400) return Math.floor(s / 3600) + ' giờ trước';
+  if (s < 86400 * 30) return Math.floor(s / 86400) + ' ngày trước';
+  return new Date(ms).toLocaleDateString('vi-VN');
+}
+const curPrefix = () => todayStr.slice(0, 8);
+function userStats(list) {
+  const pre = curPrefix(), ok = list.filter(e => Number(e.amount) > 0 && typeof e.date === 'string');
+  const month = ok.filter(e => e.date.startsWith(pre));
+  return {count: ok.length, monthCount: month.length, monthSum: month.reduce((s, e) => s + Number(e.amount), 0),
+    lastDate: ok.reduce((m, e) => e.date > m ? e.date : m, '')};
+}
+function openAdmin() {
+  if (!amAdmin) return;
+  $('admin').hidden = false; document.documentElement.classList.add('modal-open');
+  $('adminSearch').value = '';
+  if (!adminUsers) loadAdmin(); else renderAdmin();
+  $('adminClose').focus();
+}
+function closeAdmin() { $('admin').hidden = true; document.documentElement.classList.remove('modal-open'); }
+async function loadAdmin() {
+  const seq = ++adminLoadSeq;
+  adminUsers = null; renderAdmin();
+  try {
+    const snap = await fb.fdb.collection('vutru_chitieu').get({source: 'server'});
+    if (seq !== adminLoadSeq) return;
+    adminUsers = snap.docs.map(d => ({uid: d.id, ...d.data(), stats: null})).sort((a, b) => tsMs(b.lastSeen) - tsMs(a.lastSeen));
+    renderAdmin();
+    await Promise.all(adminUsers.map(async u => {
+      try { const es = await fb.fdb.collection(`vutru_chitieu/${u.uid}/expenses`).get({source: 'server'}); u.stats = userStats(es.docs.map(d => d.data())); }
+      catch (e) { u.stats = {error: true}; }
+      if (seq === adminLoadSeq) renderAdmin();
+    }));
+  } catch (e) {
+    if (seq !== adminLoadSeq) return;
+    $('adminKpis').innerHTML = '';
+    $('adminList').innerHTML = `<div class="empty">Không tải được danh sách người dùng${e && e.code ? ' (' + esc(e.code) + ')' : ''}. Kiểm tra mạng và Firestore Rules.</div>`;
+  }
+}
+function renderAdmin() {
+  const list = $('adminList'), kp = $('adminKpis');
+  if (!adminUsers) { kp.innerHTML = ''; list.innerHTML = '<div class="empty">Đang tải danh sách người dùng…</div>'; return; }
+  const week = Date.now() - 7 * 86400e3;
+  const loaded = adminUsers.filter(u => u.stats && !u.stats.error);
+  const kpi = (label, value) => `<div class="akpi"><div class="eyebrow">${label}</div><div class="mid num">${value}</div></div>`;
+  kp.innerHTML = kpi('Người dùng', adminUsers.length) + kpi('Hoạt động 7 ngày', adminUsers.filter(u => tsMs(u.lastSeen) > week).length) +
+    kpi('Đã khóa', adminUsers.filter(u => u.blocked).length) +
+    kpi(`Tổng chi tháng ${today.getMonth() + 1}`, loaded.length < adminUsers.length ? '…' : fmt(loaded.reduce((s, u) => s + u.stats.monthSum, 0)));
+  const q = $('adminSearch').value.trim().toLowerCase();
+  const shown = adminUsers.filter(u => !q || (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q));
+  if (!shown.length) { list.innerHTML = `<div class="empty">${q ? 'Không có người dùng nào khớp.' : 'Chưa có người dùng nào.'}</div>`; return; }
+  list.innerHTML = shown.map(u => {
+    const self = me && u.uid === me.uid, nm = u.name || u.email || 'Không tên';
+    const av = u.photo ? `<img src="${esc(u.photo)}" alt="" referrerpolicy="no-referrer">` : esc(nm.trim().charAt(0).toUpperCase() || '?');
+    const st = u.stats;
+    const stats = !st ? '<span class="note">Đang tính…</span>' : st.error ? '<span class="note">Không đọc được</span>' :
+      `<b>${fmt(st.monthSum)}</b>${st.monthCount} khoản tháng này · tổng ${st.count} khoản`;
+    return `<div class="urow${u.blocked ? ' blocked' : ''}" data-uid="${esc(u.uid)}">
+      <span class="av">${av}</span>
+      <div class="uinfo"><b>${esc(nm)}${self ? '<span class="tag ok">Bạn</span>' : ''}${u.blocked ? '<span class="tag bad">Đã khóa</span>' : ''}</b>
+        <div class="em">${esc(u.email || '')}</div>
+        <div class="seen">Mở app ${ago(tsMs(u.lastSeen))}${u.firstSeen ? ' · tham gia ' + new Date(tsMs(u.firstSeen)).toLocaleDateString('vi-VN') : ''}${st && st.lastDate ? ' · khoản chi gần nhất ' + parseDate(st.lastDate).toLocaleDateString('vi-VN') : ''}</div></div>
+      <div class="ustats">${stats}</div>
+      <div class="uact"><button class="btn small primary" type="button" data-view>Xem chi tiêu</button>${self ? '' : `<button class="btn small${u.blocked ? '' : ' danger'}" type="button" data-lock>${u.blocked ? 'Mở khóa' : 'Khóa'}</button>`}</div>
+    </div>`;
+  }).join('');
+}
+$('adminSearch').addEventListener('input', renderAdmin);
+$('adminReload').onclick = () => loadAdmin();
+$('adminClose').onclick = closeAdmin;
+$('admin').addEventListener('click', e => { if (e.target === $('admin')) closeAdmin(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('admin').hidden) closeAdmin(); });
+$('adminList').addEventListener('click', e => {
+  const row = e.target.closest('.urow'); if (!row) return;
+  const u = adminUsers && adminUsers.find(x => x.uid === row.dataset.uid); if (!u) return;
+  if (e.target.closest('[data-view]')) { viewUser(u); return; }
+  const lock = e.target.closest('[data-lock]'); if (!lock) return;
+  const setBlocked = async v => {
+    lock.disabled = true;
+    try {
+      await fb.fdb.doc('vutru_chitieu/' + u.uid).update(v ? {blocked: true, blockedAt: serverNow()} : {blocked: false});
+      u.blocked = v; renderAdmin();
+      toast(v ? `Đã khóa ${u.name || u.email}. Người này không đọc, ghi được dữ liệu trên máy chủ nữa.` : `Đã mở khóa ${u.name || u.email}.`);
+    } catch (err) { lock.disabled = false; toast('Không đổi được trạng thái khóa' + (err && err.code ? ' (' + err.code + ')' : '') + '.'); }
+  };
+  if (u.blocked) setBlocked(false);
+  else armOrRun(lock, 'Khóa', 'Nhấn lần nữa để khóa', () => setBlocked(true));
+});
+function viewUser(u) {
+  closeAdmin(); godAbort();
+  state.viewing = u; state.readOnly = true;
+  state.filter = {cat: null, day: null}; state.selectedId = null; closeForm(); showTab('list');
+  hideSyncBanner();
+  const nm = u.name || u.email || u.uid;
+  $('viewText').innerHTML = `Đang xem dữ liệu của <b>${esc(nm)}</b>${u.name && u.email ? ' · ' + esc(u.email) : ''}. Chỉ xem, không sửa được.`;
+  $('viewBanner').hidden = false;
+  animateNext = true;
+  startRemote(fb.fdb, `vutru_chitieu/${u.uid}/`, 'Đang xem · ' + nm);
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+function leaveView(restart = true) {
+  if (!state.viewing) return;
+  state.viewing = null; state.readOnly = false; $('viewBanner').hidden = true;
+  state.filter = {cat: null, day: null}; state.selectedId = null; animateNext = true;
+  if (restart) startOwnData();
+}
+$('viewExit').onclick = () => leaveView();
+$('viewUsers').onclick = () => openAdmin();
 function hideSyncBanner() { $('syncBanner').hidden = true; }
 function offerUpload(user, cloud) {
   const flag = 'tct-uploaded-' + user.uid;
@@ -682,7 +890,7 @@ function renderList(items) {
   fr.hidden = !chips.length;
   fr.innerHTML = chips.length ? `<span>Đang lọc:</span>${chips.join('')}<span class="num">${fmt(shown.reduce((s,e)=>s+Number(e.amount),0))}</span>` : '';
   if (!items.length) {
-    list.innerHTML = `<div class="empty"><div>Chưa có khoản chi nào trong tháng ${state.m}/${state.y}.<br>Nhấn <b>+ Thêm khoản chi</b> để ghi khoản đầu tiên.</div>${state.readOnly ? '' : '<button class="btn small" id="loadSample">Tải dữ liệu mẫu để xem thử</button>'}</div>`;
+    list.innerHTML = `<div class="empty"><div>Chưa có khoản chi nào trong tháng ${state.m}/${state.y}.${state.readOnly ? '' : '<br>Nhấn <b>+ Thêm khoản chi</b> để ghi khoản đầu tiên.'}</div>${state.readOnly ? '' : '<button class="btn small" id="loadSample">Tải dữ liệu mẫu để xem thử</button>'}</div>`;
     return;
   }
   if (!shown.length) { list.innerHTML = '<div class="empty">Không có khoản chi nào khớp bộ lọc.</div>'; return; }
@@ -715,6 +923,7 @@ function renderBudget(items) {
     return;
   }
   box.innerHTML = CATS.map(c => budgetRow(c, t[c.id], false)).join('');
+  if (state.readOnly) box.querySelectorAll('input,button').forEach(el => { el.disabled = true; });
   $('bErr').hidden = true; markRings();
 }
 function markRings() {
@@ -743,6 +952,7 @@ function refresh() {
   const items = monthItems();
   renderSummary(items); renderList(items); renderBudget(items);
   $('addBtn').disabled = state.readOnly;
+  document.querySelector('.panel').classList.toggle('ro', state.readOnly);
   rebuildScene(animateNext); animateNext = false;
 }
 
@@ -787,6 +997,7 @@ function updateLinesTotal() {
   $('fSave').textContent = state.editingId ? 'Lưu thay đổi' : cnt > 1 ? `Lưu ${cnt} khoản` : 'Lưu';
 }
 function openForm(exp) {
+  if (state.readOnly) return;
   state.editingId = exp ? exp.id : null;
   $('formTitle').textContent = exp ? 'Sửa khoản chi' : 'Thêm khoản chi';
   $('fDate').value = exp ? exp.date : defaultDate();
