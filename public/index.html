@@ -549,6 +549,14 @@ function toast(msg, action) {
   if (action) { const b = document.createElement('button'); b.type = 'button'; b.textContent = action.label; b.onclick = () => { t.hidden = true; clearTimeout(toastT); action.run(); }; t.appendChild(b); }
   t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, action ? 6000 : 2800);
 }
+// Turns a failed save into a message that says why (the error code), instead of always blaming the network.
+function failMsg(what, err) {
+  console.error(what, err);
+  const c = (err && err.code) || '';
+  if (c === 'permission-denied') return `${what}: máy chủ từ chối quyền ghi (permission-denied). Kiểm tra Firestore Rules hoặc tài khoản có đang bị khóa không.`;
+  if (c === 'unavailable') return `${what}: không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.`;
+  return `${what}. Thử lại sau${c ? ' (' + c + ')' : (err && err.message ? ' (' + err.message + ')' : '')}.`;
+}
 const TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
 async function deleteExpense(id) {
   const exp = state.expenses.find(x => x.id === id); if (!exp) return;
@@ -563,7 +571,7 @@ async function deleteExpense(id) {
       const nid = uid(); if (data.date.startsWith(monthPrefix())) godPush([{type: 'add', cat: catOf(data.cat).id, ids: [nid]}]);
       try { await api.add(data, nid); toast('Đã khôi phục khoản chi'); } catch (e) { toast('Không khôi phục được. Hãy thêm lại thủ công.'); }
     }});
-  } catch (e) { toast(state.readOnly ? 'Bạn chỉ có quyền xem, không thể xóa.' : 'Không xóa được. Kiểm tra kết nối rồi thử lại.'); }
+  } catch (e) { toast(state.readOnly ? 'Bạn chỉ có quyền xem, không thể xóa.' : failMsg('Không xóa được', e)); }
 }
 
 // ---------- Storage ----------
@@ -1070,7 +1078,7 @@ form.addEventListener('submit', async e => {
     closeForm();
     if (y !== state.y || m !== state.m) { state.y = y; state.m = m; state.filter = {cat: null, day: null}; animateNext = true; refresh(); }
   } catch (err) {
-    formError(state.readOnly ? 'Bạn chỉ có quyền xem trang này, không thể lưu.' : 'Không lưu được. Kiểm tra kết nối rồi thử lại.');
+    formError(state.readOnly ? 'Bạn chỉ có quyền xem trang này, không thể lưu.' : failMsg('Không lưu được', err));
   } finally { $('fSave').disabled = false; }
 });
 $('fCancel').onclick = closeForm;
@@ -1094,12 +1102,12 @@ $('fDelete').onclick = () => armOrRun($('fDelete'), 'Xóa', 'Nhấn lần nữa 
   const ex = state.expenses.find(x => x.id === id);
   if (ex && ex.date.startsWith(monthPrefix())) godPush([{type: 'remove', cat: catOf(ex.cat).id, id, size: rockSize(id)}]);
   try { await api.remove(id); toast('Đã xóa khoản chi'); state.selectedId = null; closeForm(); refresh(); }
-  catch (e) { formError('Không xóa được. Thử lại sau.'); }
+  catch (e) { formError(failMsg('Không xóa được', e)); }
 });
 $('clearSamples').onclick = () => armOrRun($('clearSamples'), 'Xóa dữ liệu mẫu', 'Nhấn lần nữa để xác nhận', async () => {
   const ids = state.expenses.filter(e => e.sample).map(e => e.id);
   try { for (const id of ids) await api.remove(id); toast(`Đã xóa ${ids.length} khoản chi mẫu`); }
-  catch (e) { toast('Không xóa được hết dữ liệu mẫu. Thử lại sau.'); }
+  catch (e) { toast(failMsg('Không xóa được hết dữ liệu mẫu', e)); }
 });
 async function loadSample() {
   const isCur = state.y === today.getFullYear() && state.m === today.getMonth() + 1;
@@ -1108,7 +1116,7 @@ async function loadSample() {
     if (!totalBudget()) await api.saveSettings({budgets: {...DEFAULT_BUDGETS}, categories: CATS.map(c => ({...c}))});
     for (const r of rows) await api.add(r);
     toast(`Đã thêm ${rows.length} khoản chi mẫu`); animateNext = true; refresh();
-  } catch (e) { toast('Không tải được dữ liệu mẫu.'); }
+  } catch (e) { toast(failMsg('Không tải được dữ liệu mẫu', e)); }
 }
 
 // list interactions
@@ -1192,7 +1200,7 @@ $('saveBudget').onclick = async () => {
   godPush(tasks);
   $('saveBudget').disabled = true;
   try { await api.saveSettings({budgets, categories}); budgetDirty = false; renderBudget(monthItems()); if (state.view === 'system') fitCamera(); toast('Đã lưu ngân sách, danh mục và thứ tự'); }
-  catch (e) { toast(state.readOnly ? 'Bạn chỉ có quyền xem, không thể lưu ngân sách.' : 'Không lưu được. Kiểm tra kết nối rồi thử lại.'); }
+  catch (e) { toast(state.readOnly ? 'Bạn chỉ có quyền xem, không thể lưu ngân sách.' : failMsg('Không lưu được ngân sách', e)); }
   finally { $('saveBudget').disabled = false; }
 };
 

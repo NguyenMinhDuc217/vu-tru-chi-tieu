@@ -21,9 +21,9 @@ service cloud.firestore {
     function isVtctOwner(uid) {
       return request.auth != null && request.auth.uid == uid;
     }
-    function vtctNotBlocked(uid) {
-      let p = /databases/$(database)/documents/vutru_chitieu/$(uid);
-      return !exists(p) || get(p).data.get('blocked', false) != true;
+    function vtctBlocked(uid) {
+      return exists(/databases/$(database)/documents/vutru_chitieu/$(uid))
+        && get(/databases/$(database)/documents/vutru_chitieu/$(uid)).data.get('blocked', false) == true;
     }
 
     match /vutru_chitieu/{uid} {
@@ -35,8 +35,8 @@ service cloud.firestore {
     }
 
     match /vutru_chitieu/{uid}/{sub}/{document=**} {
-      allow read: if isVtctAdmin() || (isVtctOwner(uid) && vtctNotBlocked(uid));
-      allow write: if isVtctOwner(uid) && vtctNotBlocked(uid);
+      allow read: if isVtctAdmin() || (isVtctOwner(uid) && !vtctBlocked(uid));
+      allow write: if isVtctOwner(uid) && !vtctBlocked(uid);
     }
   }
 }
