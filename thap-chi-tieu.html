@@ -49,7 +49,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .brand h1{text-shadow:0 0 22px rgba(186,150,255,.55)}
 #scene{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 #scene.pointing{cursor:pointer}
-.stage-head{position:absolute;inset:0 0 auto 0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;padding:16px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));pointer-events:none}
+.stage-head{position:absolute;inset:0 0 auto 0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));pointer-events:none}
 .stage-head>*{pointer-events:auto}
 .brand h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(22px,2.4vw,30px);letter-spacing:-.03em;line-height:1;text-wrap:balance}
 .mode{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 8px}
@@ -76,7 +76,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .god-cap{position:absolute;top:calc(74px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(14,11,34,.82);border:1px solid rgba(255,210,122,.55);color:#FFE7B0;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:0 0 22px rgba(255,190,90,.3);white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis;pointer-events:none;z-index:4}
 .nogl{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--muted)}
 
-.panel{min-width:0;overflow-y:auto;background:var(--panel);border-left:1px solid var(--line);padding-block:18px 40px;padding-left:20px;padding-right:max(20px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.panel{min-width:0;overflow-y:auto;background:var(--panel);border-left:1px solid var(--line);padding-block:max(18px,env(safe-area-inset-top,0px)) max(40px,env(safe-area-inset-bottom,0px));padding-left:20px;padding-right:max(20px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
 .month{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;gap:8px;text-align:center}
 .month h2{margin:2px 0 0;font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:-.03em}
 .iconbtn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-size:20px;line-height:1}
@@ -201,6 +201,10 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
 .admin-search{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px}
 .admin-search:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .admin-list{display:grid;gap:8px}
+.admin-page{display:grid;gap:16px}
+.admin-nav{box-shadow:none;width:fit-content}
+.admin-nav button{padding:8px 16px}
+.admin .eng-log{min-height:40vh}
 .urow{display:grid;grid-template-columns:40px minmax(0,1fr) minmax(150px,auto) auto;grid-template-areas:"av info stats act";gap:8px 14px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
 .urow.blocked{border-style:dashed;border-color:var(--danger)}
 .urow .av{grid-area:av;width:40px;height:40px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700;overflow:hidden}
@@ -217,7 +221,7 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
 .prefs .seg{box-shadow:none}
 .prefs .seg button{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;font-size:12.5px}
 .prefs .seg svg{width:14px;height:14px;flex:none}
-/* English tutor tab */
+/* English tutor page (inside the admin sheet) */
 .eng-bar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:end}
 .eng-bar .btn{height:38px}
 .eng-log{display:flex;flex-direction:column;gap:14px;min-height:120px}
@@ -252,6 +256,13 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
 .eng-actions .btn{height:44px}
 .eng-actions .iconbtn{height:44px;width:44px;display:grid;place-items:center}
 #engMic.rec{background:var(--danger);border-color:var(--danger);color:#fff}
+
+.install{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.install img{border-radius:10px;flex:none}
+.install-text{flex:1;min-width:0;display:grid;gap:2px;font-size:12.5px;color:var(--muted)}
+.install-text b{color:var(--fg);font-size:13.5px}
+.install .btn{flex:none}
+.install .iconbtn{width:32px;height:32px;flex:none}
 
 .howto summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);width:fit-content}
 .howto summary:hover{color:var(--fg)}
@@ -374,6 +385,12 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
         <button type="button" data-theme-opt="dark" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>Tối</button>
       </div>
     </div>
+    <div class="install" id="install" hidden>
+      <img src="/icons/icon-192.png" alt="" width="40" height="40">
+      <div class="install-text"><b>Cài thành ứng dụng</b><span id="installHint">Mở nhanh từ màn hình chính như app thật.</span></div>
+      <button class="btn small primary" type="button" id="installBtn">Cài đặt</button>
+      <button class="iconbtn" type="button" id="installClose" aria-label="Ẩn gợi ý cài ứng dụng">×</button>
+    </div>
     <div class="account" id="account" hidden></div>
     <div class="month">
       <button class="iconbtn" id="prevM" aria-label="Tháng trước">‹</button>
@@ -410,7 +427,6 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
     <div class="tabs" role="tablist">
       <button role="tab" id="tabBtnList" aria-selected="true" aria-controls="tabList">Khoản chi</button>
       <button role="tab" id="tabBtnBudget" aria-selected="false" aria-controls="tabBudget">Ngân sách</button>
-      <button role="tab" id="tabBtnEnglish" aria-selected="false" aria-controls="tabEnglish" hidden>Tiếng Anh</button>
     </div>
 
     <section id="tabList" class="stack" role="tabpanel">
@@ -452,7 +468,25 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
       <div class="row-actions"><button class="btn" id="addCat">+ Thêm mục ngân sách</button><button class="btn primary" id="saveBudget">Lưu thay đổi</button></div>
     </section>
 
-    <section id="tabEnglish" class="stack eng" role="tabpanel" hidden>
+  </aside>
+</div>
+<div class="admin" id="admin" role="dialog" aria-modal="true" aria-labelledby="adminTitle" hidden>
+  <div class="admin-box">
+    <header class="admin-head">
+      <div><div class="eyebrow">Trang quản trị</div><h2 id="adminTitle">Người dùng</h2></div>
+      <div class="row-actions"><button class="btn small" type="button" id="adminReload">Tải lại</button><button class="iconbtn" type="button" id="adminClose" aria-label="Đóng trang quản trị">×</button></div>
+    </header>
+    <nav class="seg admin-nav" aria-label="Các trang quản trị">
+      <button type="button" data-apage="users" aria-pressed="true">Người dùng</button>
+      <button type="button" data-apage="english" aria-pressed="false">Học tiếng Anh</button>
+    </nav>
+    <div class="admin-page" id="adminUsers">
+      <div class="admin-kpis" id="adminKpis"></div>
+      <input class="admin-search" id="adminSearch" type="search" placeholder="Tìm theo tên hoặc email" aria-label="Tìm người dùng" autocomplete="off">
+      <div class="admin-list" id="adminList"></div>
+      <p class="note">Người dùng hiện ở đây sau khi mở app và đăng nhập. “Xem chi tiêu” mở toàn bộ dữ liệu của người đó ở chế độ chỉ xem. Tài khoản bị khóa không đọc, ghi được dữ liệu của mình trên máy chủ cho đến khi được mở khóa.</p>
+    </div>
+    <section id="adminEnglish" class="stack eng" hidden>
       <div class="eng-bar">
         <div class="field"><label for="engScenario">Chủ đề</label>
           <select id="engScenario">
@@ -481,18 +515,6 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
         </div>
       </form>
     </section>
-  </aside>
-</div>
-<div class="admin" id="admin" role="dialog" aria-modal="true" aria-labelledby="adminTitle" hidden>
-  <div class="admin-box">
-    <header class="admin-head">
-      <div><div class="eyebrow">Trang quản trị</div><h2 id="adminTitle">Người dùng</h2></div>
-      <div class="row-actions"><button class="btn small" type="button" id="adminReload">Tải lại</button><button class="iconbtn" type="button" id="adminClose" aria-label="Đóng trang quản trị">×</button></div>
-    </header>
-    <div class="admin-kpis" id="adminKpis"></div>
-    <input class="admin-search" id="adminSearch" type="search" placeholder="Tìm theo tên hoặc email" aria-label="Tìm người dùng" autocomplete="off">
-    <div class="admin-list" id="adminList"></div>
-    <p class="note">Người dùng hiện ở đây sau khi mở app và đăng nhập. “Xem chi tiêu” mở toàn bộ dữ liệu của người đó ở chế độ chỉ xem. Tài khoản bị khóa không đọc, ghi được dữ liệu của mình trên máy chủ cho đến khi được mở khóa.</p>
   </div>
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -705,8 +727,44 @@ function touchProfile(user) {
   const data = {name: user.displayName || '', email: user.email || '', photo: user.photoURL || '', lastSeen: serverNow()};
   ref.get({source: 'server'}).then(s => ref.set(s.exists ? data : {...data, firstSeen: serverNow()}, {merge: true})).catch(e => console.warn('profile', e));
 }
+// Opened from the home screen (installed PWA). There, popups do not come back to the app (iOS), so
+// sign-in uses a redirect, and the redirect goes through this site's own /__/auth/ (functions/__/)
+// on the hosts listed in FIREBASE_AUTH_PROXY_HOSTS, because Safari blocks the cross-site storage
+// a redirect through firebaseapp.com needs.
+const standaloneApp = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+// ----- "Install as an app" hint (only on the hosted site, which has a web app manifest) -----
+// Android / desktop Chrome and Edge: the browser's own install prompt. iPhone / iPad: no prompt exists,
+// so the button shows the "Add to Home Screen" steps instead.
+(() => {
+  if (!document.querySelector('link[rel="manifest"]') || standaloneApp()) return;
+  const KEY = 'tct-install-hidden';
+  try { if (localStorage.getItem(KEY)) return; } catch (e) {}
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let prompt = null;
+  const box = $('install'), hint = $('installHint'), btn = $('installBtn');
+  if (ios) { btn.textContent = 'Cách cài'; box.hidden = false; }
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); prompt = e; box.hidden = false; });
+  addEventListener('appinstalled', () => { box.hidden = true; prompt = null; toast('Đã cài xong. Mở Vũ Trụ Chi Tiêu từ màn hình chính.'); });
+  btn.onclick = async () => {
+    if (prompt) {
+      const p = prompt; prompt = null; p.prompt();
+      try { const r = await p.userChoice; if (r && r.outcome === 'accepted') box.hidden = true; } catch (e) {}
+      return;
+    }
+    btn.hidden = true;
+    hint.innerHTML = !ios
+      ? 'Mở menu <b>⋮</b> của trình duyệt, chọn <b>Cài đặt ứng dụng</b> hoặc <b>Thêm vào màn hình chính</b>.'
+      : 'Bấm nút <b>Chia sẻ</b> <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="(ô vuông có mũi tên lên)" style="vertical-align:-2px"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11v9h12v-9"/></svg> của trình duyệt, chọn <b>Thêm vào MH chính</b> (Add to Home Screen), rồi bấm <b>Thêm</b>.';
+  };
+  $('installClose').onclick = () => { box.hidden = true; try { localStorage.setItem(KEY, '1'); } catch (e) {} };
+})();
+function firebaseConfig() {
+  const cfg = {...window.FIREBASE_CONFIG};
+  if (standaloneApp() && (window.FIREBASE_AUTH_PROXY_HOSTS || []).includes(location.hostname)) cfg.authDomain = location.hostname;
+  return cfg;
+}
 function startFirebase() {
-  const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(window.FIREBASE_CONFIG);
+  const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig());
   const auth = firebase.auth(app), fdb = firebase.firestore(app);
   try { fdb.enablePersistence({synchronizeTabs: true}).catch(() => {}); } catch (e) {}
   fb = {auth, fdb};
@@ -744,6 +802,7 @@ function authError(e) {
 async function signIn() {
   const provider = new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({prompt: 'select_account'});
+  if (standaloneApp()) { try { await fb.auth.signInWithRedirect(provider); } catch (e) { toast(authError(e)); } return; }
   try { await fb.auth.signInWithPopup(provider); }
   catch (e) {
     if (['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment'].includes(e.code)) { try { await fb.auth.signInWithRedirect(provider); } catch (e2) { toast(authError(e2)); } }
@@ -752,8 +811,6 @@ async function signIn() {
 }
 function renderAccount(user) {
   const el = $('account');
-  $('tabBtnEnglish').hidden = !amAdmin;
-  if (!amAdmin && !$('tabEnglish').hidden) showTab('list');
   if (user === undefined) { el.innerHTML = '<span class="acc-text">Đang kiểm tra đăng nhập…</span>'; return; }
   if (!user) {
     el.innerHTML = '<span class="acc-text">Đăng nhập để lưu dữ liệu trên máy chủ và đồng bộ giữa các thiết bị.</span><button class="btn small primary" type="button" data-acc="in">Đăng nhập Google</button>';
@@ -788,12 +845,24 @@ function userStats(list) {
   return {count: ok.length, monthCount: month.length, monthSum: month.reduce((s, e) => s + Number(e.amount), 0),
     lastDate: ok.reduce((m, e) => e.date > m ? e.date : m, '')};
 }
-function openAdmin() {
+// The admin sheet has two pages: the user list and the English tutor. It reopens on the last one used.
+let adminPage = 'users';
+function adminShow(page) {
+  adminPage = page === 'english' ? 'english' : 'users';
+  const en = adminPage === 'english';
+  $('adminUsers').hidden = en; $('adminEnglish').hidden = !en; $('adminReload').hidden = en;
+  $('adminTitle').textContent = en ? 'Học tiếng Anh' : 'Người dùng';
+  document.querySelectorAll('[data-apage]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.apage === adminPage)));
+  $('admin').scrollTop = 0;
+  if (en) engOpen();
+  else if (!adminUsers) loadAdmin(); else renderAdmin();
+}
+function openAdmin(page) {
   if (!amAdmin) return;
   $('admin').hidden = false; document.documentElement.classList.add('modal-open');
   $('adminSearch').value = '';
-  if (!adminUsers) loadAdmin(); else renderAdmin();
-  $('adminClose').focus();
+  adminShow(page || adminPage);
+  if (adminPage === 'users') $('adminClose').focus();
 }
 function closeAdmin() { $('admin').hidden = true; document.documentElement.classList.remove('modal-open'); }
 async function loadAdmin() {
@@ -846,6 +915,7 @@ function renderAdmin() {
 $('adminSearch').addEventListener('input', renderAdmin);
 $('adminReload').onclick = () => loadAdmin();
 $('adminClose').onclick = closeAdmin;
+document.querySelector('.admin-nav').addEventListener('click', e => { const b = e.target.closest('[data-apage]'); if (b) adminShow(b.dataset.apage); });
 $('admin').addEventListener('click', e => { if (e.target === $('admin')) closeAdmin(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('admin').hidden) closeAdmin(); });
 $('adminList').addEventListener('click', e => {
@@ -883,7 +953,7 @@ function leaveView(restart = true) {
   if (restart) startOwnData();
 }
 $('viewExit').onclick = () => leaveView();
-$('viewUsers').onclick = () => openAdmin();
+$('viewUsers').onclick = () => openAdmin('users');
 
 // ----- English tutor (admin only): chat with corrections explained in English and Vietnamese -----
 // Replies come from /api/english (functions/api/english.js), which keeps the Gemini key on the server.
@@ -1307,12 +1377,10 @@ $('filterRow').addEventListener('click', e => {
 
 // tabs
 function showTab(which) {
-  [['list', 'tabList', 'tabBtnList'], ['budget', 'tabBudget', 'tabBtnBudget'], ['english', 'tabEnglish', 'tabBtnEnglish']].forEach(([k, panel, btn]) => {
+  [['list', 'tabList', 'tabBtnList'], ['budget', 'tabBudget', 'tabBtnBudget']].forEach(([k, panel, btn]) => {
     $(panel).hidden = k !== which; $(btn).setAttribute('aria-selected', String(k === which));
   });
-  if (which === 'english') engOpen();
 }
-$('tabBtnEnglish').onclick = () => showTab('english');
 $('tabBtnList').onclick = () => showTab('list');
 $('tabBtnBudget').onclick = () => { budgetDirty = false; renderBudget(monthItems()); showTab('budget'); };
 $('budgetRows').addEventListener('input', e => {

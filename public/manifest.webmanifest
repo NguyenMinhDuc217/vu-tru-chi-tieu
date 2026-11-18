@@ -1,0 +1,19 @@
+{
+  "id": "/",
+  "name": "Vũ Trụ Chi Tiêu",
+  "short_name": "Chi Tiêu",
+  "description": "Quản lý chi tiêu hàng tháng bằng một hệ hành tinh 3D.",
+  "lang": "vi",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#04030D",
+  "theme_color": "#04030D",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {"src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+    {"src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ]
+}

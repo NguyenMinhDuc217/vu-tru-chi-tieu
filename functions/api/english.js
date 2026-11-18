@@ -1,4 +1,4 @@
-// POST /api/english: English conversation tutor backed by the Gemini Interactions API.
+// POST /api/english: English conversation tutor backed by the Gemini API (generateContent).
 // Runs as a Cloudflare Pages Function, so the Gemini key (env GEMINI_API_KEY) never reaches the browser.
 //
 // Only the admin account may use it. Instead of keeping a second copy of the admin's identity here,
@@ -11,8 +11,12 @@
 // Response: {corrected, is_correct, mistakes[], better, reply, reply_vi, vocabulary[]}
 
 const FIREBASE_PROJECT = 'python-chat-7e32a';
-const DEFAULT_MODEL = 'gemini-3.8-flash';
-const API_REVISION = '2026-05-20';
+// Tried in order: when a model is overloaded or out of free quota, the next one answers instead.
+// GEMINI_MODEL (optional env var) goes first.
+// The last one is a fast "lite" model: less polished explanations, but it rarely fails.
+const MODELS = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-3.5-flash-lite'];
+const RETRY_STATUS = new Set([429, 500, 503, 504]);
+const TIMEOUT_MS = 20000;
 const MAX_TURNS = 24;
 const MAX_CHARS = 1200;
 
@@ -128,44 +132,59 @@ export async function onRequestPost({request, env}) {
     .map(m => ({role: m.role, text: str(m.text, MAX_CHARS)}));
   if (messages.length && messages[messages.length - 1].role !== 'user') return json(400, {error: 'bad_request', message: 'Tin nhắn cuối phải là của người học.'});
 
-  let res;
-  try {
-    res = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
-      method: 'POST',
-      headers: {'content-type': 'application/json', 'x-goog-api-key': env.GEMINI_API_KEY, 'Api-Revision': API_REVISION},
-      body: JSON.stringify({
-        model: env.GEMINI_MODEL || DEFAULT_MODEL,
-        store: false,
-        system_instruction: systemInstruction(scenario, level),
-        input: transcript(messages),
-        response_format: {type: 'text', mime_type: 'application/json', schema: SCHEMA},
-        generation_config: {thinking_level: 'low', max_output_tokens: 4096},
-      }),
-    });
-  } catch (e) {
-    return json(502, {error: 'upstream_unreachable', message: 'Không kết nối được Gemini. Thử lại sau.'});
+  const requestBody = JSON.stringify({
+    systemInstruction: {parts: [{text: systemInstruction(scenario, level)}]},
+    contents: [{role: 'user', parts: [{text: transcript(messages)}]}],
+    generationConfig: {
+      responseMimeType: 'application/json', responseJsonSchema: SCHEMA,
+      maxOutputTokens: 4096, thinkingConfig: {thinkingLevel: 'low'},
+    },
+  });
+  const models = [...new Set([env.GEMINI_MODEL, ...MODELS].filter(Boolean))];
+  let res = null, data = null, lastError = null;
+  for (const model of models) {
+    try {
+      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+        method: 'POST',
+        headers: {'content-type': 'application/json', 'x-goog-api-key': env.GEMINI_API_KEY},
+        body: requestBody,
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+      });
+    } catch (e) {
+      console.error('gemini fetch', model, e && e.name);
+      res = null; lastError = e; continue;
+    }
+    data = await res.json().catch(() => null);
+    if (res.ok) { console.log('gemini ok', model); break; }
+    if (!RETRY_STATUS.has(res.status)) break;
+    console.error('gemini', model, res.status, (data && data.error && data.error.message) || '');
   }
 
-  const data = await res.json().catch(() => null);
+  if (!res) {
+    const slow = lastError && (lastError.name === 'TimeoutError' || lastError.name === 'AbortError');
+    return json(502, {error: 'upstream_unreachable', message: slow ? 'Gemini trả lời quá lâu. Thử gửi lại.' : 'Không kết nối được Gemini. Thử lại sau.'});
+  }
   if (!res.ok) {
     const detail = (data && data.error && data.error.message) || '';
     console.error('gemini', res.status, detail);
     if (res.status === 429) return json(429, {error: 'quota', message: 'Đã hết hạn mức miễn phí của Gemini lúc này. Đợi ít phút rồi thử lại.'});
+    if (res.status === 503 || res.status === 500 || res.status === 504) return json(503, {error: 'busy', message: 'Gemini đang quá tải. Đợi một lát rồi thử lại.'});
     if (res.status === 400 && /api key/i.test(detail)) return json(502, {error: 'bad_key', message: 'GEMINI_API_KEY không hợp lệ.'});
     if (res.status === 403) return json(502, {error: 'bad_key', message: 'GEMINI_API_KEY không có quyền dùng mô hình này.'});
     return json(502, {error: 'upstream', message: `Gemini báo lỗi (${res.status})${detail ? ': ' + detail.slice(0, 200) : ''}.`});
   }
-  if (!data || (data.status && data.status !== 'completed')) {
-    console.error('gemini status', data && data.status, data && data.errors);
-    return json(502, {error: 'incomplete', message: 'Gemini chưa trả lời xong. Thử gửi lại.'});
-  }
 
-  // The answer is the text of the last model_output step.
-  const outputs = (data.steps || []).filter(s => s && s.type === 'model_output');
-  const text = outputs.length ? (outputs[outputs.length - 1].content || []).filter(c => c && c.type === 'text').map(c => c.text).join('') : '';
+  // The answer is the non-thought text of the first candidate.
+  const cand = data && Array.isArray(data.candidates) ? data.candidates[0] : null;
+  const text = cand && cand.content && Array.isArray(cand.content.parts)
+    ? cand.content.parts.filter(p => p && !p.thought && typeof p.text === 'string').map(p => p.text).join('') : '';
+  if (!text) {
+    console.error('gemini empty', cand && cand.finishReason, data && data.promptFeedback);
+    return json(502, {error: 'bad_output', message: 'Gemini không trả lời. Thử gửi lại.'});
+  }
   let out;
   try { out = JSON.parse(text); } catch (e) {
-    console.error('gemini non-json', text.slice(0, 300));
+    console.error('gemini non-json', cand.finishReason, text.slice(0, 300));
     return json(502, {error: 'bad_output', message: 'Gemini trả về dữ liệu không đúng định dạng. Thử gửi lại.'});
   }
   if (!str(out.reply)) return json(502, {error: 'bad_output', message: 'Gemini không trả lời. Thử gửi lại.'});

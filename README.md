@@ -23,6 +23,9 @@ Dữ liệu lưu ở đâu:
 | `firebase-config.js` | Cấu hình dự án Firebase cho bản công khai (để `null` thì chỉ lưu trên trình duyệt) |
 | `firestore.rules` | Quy tắc bảo mật Firestore: mỗi người chỉ đọc/ghi dữ liệu của mình |
 | `functions/api/english.js` | Backend học tiếng Anh (Cloudflare Pages Functions, gọi Gemini) |
+| `public/manifest.webmanifest`, `public/sw.js`, `public/icons/` | Cài thành ứng dụng (PWA): manifest, service worker, biểu tượng |
+| `public/_headers` | Header cache cho Cloudflare Pages (service worker luôn được kiểm tra bản mới) |
+| `functions/__/[[path]].js` | Chuyển `/__/auth/*` tới Firebase để app đã cài đăng nhập Google trên chính tên miền này |
 
 ## Chạy trên máy
 
@@ -61,13 +64,31 @@ Ai là quản trị viên do `firestore.rules` quyết định (hàm `isVtctAdmi
 Khi dán rules vào Firebase Console, thay `EMAIL_QUAN_TRI` bằng email Google của quản trị viên.
 Người dùng chỉ hiện trong danh sách sau khi mở app (đã đăng nhập) ít nhất một lần, vì lúc đó app mới tạo hồ sơ `vutru_chitieu/<uid>`.
 
+## Cài thành ứng dụng (PWA)
+
+- **Android (Chrome, Edge, Samsung Internet):** bấm **Cài đặt** ở gợi ý "Cài thành ứng dụng" trong panel, hoặc menu ⋮ → *Cài đặt ứng dụng*.
+- **iPhone / iPad (Safari, iOS 16.4+ cả Chrome):** nút Chia sẻ → *Thêm vào MH chính*.
+- Trang được mở bằng mạng trước, nên bản deploy mới hiện ngay lần mở sau; mất mạng thì dùng bản đã lưu. Dữ liệu chi tiêu
+  vẫn đồng bộ qua Firestore (có bản lưu offline).
+- App đã cài trên iOS có bộ nhớ riêng, không dùng chung với Safari, nên cần đăng nhập lại một lần trong app.
+
+**Đăng nhập trong app đã cài.** Ở chế độ này popup không quay lại được app, nên app đăng nhập bằng redirect qua
+`https://vu-tru-chi-tieu.pages.dev/__/auth/handler` (được `functions/__/[[path]].js` chuyển tới Firebase). Cần làm một lần:
+
+1. [Google Cloud Console → APIs & Services → Credentials](https://console.cloud.google.com/apis/credentials), chọn đúng dự án Firebase
+2. Mở OAuth 2.0 Client **Web client (auto created by Google Service)**
+3. *Authorized JavaScript origins*: thêm `https://vu-tru-chi-tieu.pages.dev`
+4. *Authorized redirect URIs*: thêm `https://vu-tru-chi-tieu.pages.dev/__/auth/handler` → **Save**
+
+Đổi tên miền thì sửa `FIREBASE_AUTH_PROXY_HOSTS` trong `firebase-config.js` và thêm URI tương ứng.
+
 ## Học tiếng Anh (chỉ quản trị viên)
 
-Tab **Tiếng Anh** trong panel chỉ hiện với tài khoản quản trị: luyện hội thoại theo chủ đề (nhà hàng, phỏng vấn, du lịch…)
+Trang **Học tiếng Anh** nằm trong trang quản trị (bấm **Quản trị**, chọn **Học tiếng Anh**), chỉ tài khoản quản trị dùng được: luyện hội thoại theo chủ đề (nhà hàng, phỏng vấn, du lịch…)
 và trình độ; mỗi câu bạn viết được sửa lỗi, kèm giải thích bằng tiếng Anh và tiếng Việt. Câu trả lời có bản dịch, nút nghe
 phát âm, và có thể nói bằng micro trên trình duyệt hỗ trợ. Lịch sử lưu ở `vutru_chitieu/<uid>/english/current`.
 
-- AI: Google Gemini (bản miễn phí, mô hình mặc định `gemini-3.8-flash`). Ở bản miễn phí, Google có thể dùng nội dung hội thoại để cải thiện sản phẩm.
+- AI: Google Gemini (bản miễn phí, mô hình chính `gemini-3.8-flash`; khi quá tải tự chuyển sang `gemini-flash-latest` rồi `gemini-3.5-flash-lite`). Ở bản miễn phí, Google có thể dùng nội dung hội thoại để cải thiện sản phẩm.
 - Backend: `functions/api/english.js` (Cloudflare Pages Functions) giữ API key trên máy chủ. Nó hỏi Firestore xem người gọi có
   phải quản trị viên không (Firestore tự kiểm tra token đăng nhập và áp dụng `firestore.rules`), nên không cần cấu hình email ở đây.
 
@@ -76,7 +97,7 @@ Cài đặt một lần:
 1. Lấy API key miễn phí tại https://aistudio.google.com/apikey
 2. Cloudflare → Workers & Pages → dự án `vu-tru-chi-tieu` → **Settings → Variables and Secrets** → **Add**:
    kiểu **Secret**, tên `GEMINI_API_KEY`, giá trị là key vừa lấy (môi trường Production)
-3. Tuỳ chọn: biến `GEMINI_MODEL` để đổi mô hình
+3. Tuỳ chọn: biến `GEMINI_MODEL` để thử một mô hình khác trước danh sách trên
 4. Deploy lại (push một commit hoặc **Deployments → Retry deployment**) để biến có hiệu lực
 
 ## Cập nhật ứng dụng
