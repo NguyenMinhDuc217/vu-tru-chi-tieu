@@ -22,6 +22,7 @@ Dữ liệu lưu ở đâu:
 | `public/index.html` | Trang để deploy (được tạo bởi `build.sh`) |
 | `firebase-config.js` | Cấu hình dự án Firebase cho bản công khai (để `null` thì chỉ lưu trên trình duyệt) |
 | `firestore.rules` | Quy tắc bảo mật Firestore: mỗi người chỉ đọc/ghi dữ liệu của mình |
+| `functions/api/english.js` | Backend học tiếng Anh (Cloudflare Pages Functions, gọi Gemini) |
 
 ## Chạy trên máy
 
@@ -59,6 +60,24 @@ Tài khoản quản trị thấy nút **Quản trị** trong ô tài khoản. Tr
 Ai là quản trị viên do `firestore.rules` quyết định (hàm `isVtctAdmin`), app không ghi email đó trong mã nguồn.
 Khi dán rules vào Firebase Console, thay `EMAIL_QUAN_TRI` bằng email Google của quản trị viên.
 Người dùng chỉ hiện trong danh sách sau khi mở app (đã đăng nhập) ít nhất một lần, vì lúc đó app mới tạo hồ sơ `vutru_chitieu/<uid>`.
+
+## Học tiếng Anh (chỉ quản trị viên)
+
+Tab **Tiếng Anh** trong panel chỉ hiện với tài khoản quản trị: luyện hội thoại theo chủ đề (nhà hàng, phỏng vấn, du lịch…)
+và trình độ; mỗi câu bạn viết được sửa lỗi, kèm giải thích bằng tiếng Anh và tiếng Việt. Câu trả lời có bản dịch, nút nghe
+phát âm, và có thể nói bằng micro trên trình duyệt hỗ trợ. Lịch sử lưu ở `vutru_chitieu/<uid>/english/current`.
+
+- AI: Google Gemini (bản miễn phí, mô hình mặc định `gemini-3.8-flash`). Ở bản miễn phí, Google có thể dùng nội dung hội thoại để cải thiện sản phẩm.
+- Backend: `functions/api/english.js` (Cloudflare Pages Functions) giữ API key trên máy chủ. Nó hỏi Firestore xem người gọi có
+  phải quản trị viên không (Firestore tự kiểm tra token đăng nhập và áp dụng `firestore.rules`), nên không cần cấu hình email ở đây.
+
+Cài đặt một lần:
+
+1. Lấy API key miễn phí tại https://aistudio.google.com/apikey
+2. Cloudflare → Workers & Pages → dự án `vu-tru-chi-tieu` → **Settings → Variables and Secrets** → **Add**:
+   kiểu **Secret**, tên `GEMINI_API_KEY`, giá trị là key vừa lấy (môi trường Production)
+3. Tuỳ chọn: biến `GEMINI_MODEL` để đổi mô hình
+4. Deploy lại (push một commit hoặc **Deployments → Retry deployment**) để biến có hiệu lực
 
 ## Cập nhật ứng dụng
 

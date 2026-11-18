@@ -240,6 +240,42 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
 .prefs .seg{box-shadow:none}
 .prefs .seg button{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;font-size:12.5px}
 .prefs .seg svg{width:14px;height:14px;flex:none}
+/* English tutor tab */
+.eng-bar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:end}
+.eng-bar .btn{height:38px}
+.eng-log{display:flex;flex-direction:column;gap:14px;min-height:120px}
+.msg{display:flex;flex-direction:column;gap:6px;max-width:94%}
+.msg.me{align-self:flex-end;align-items:flex-end}
+.msg.ai{align-self:flex-start;align-items:flex-start}
+.bubble{padding:9px 13px;border-radius:16px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.me .bubble{background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:5px}
+.msg.ai .bubble{background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:5px}
+.bubble.typing{color:var(--muted);letter-spacing:.2em}
+.say{border:0;background:none;color:inherit;opacity:.65;cursor:pointer;padding:2px 3px;margin-left:6px;vertical-align:-3px;border-radius:6px}
+.say:hover,.say:focus-visible{opacity:1}
+.fb{align-self:stretch;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:10px;padding:10px 12px;font-size:13px;display:grid;gap:10px}
+.fb.ok{border-left-color:var(--ok)} .fb.ok>b{color:var(--ok)}
+.fb.pending{border-left-color:var(--line);color:var(--muted)}
+.fb-fix{font-weight:600;margin-top:2px}
+.fb ol{margin:0;padding-left:18px;display:grid;gap:10px}
+.fb li .tag{margin-left:0}
+.fb .fix{margin-top:2px}
+.fb del{color:var(--danger)} .fb ins{color:var(--ok);text-decoration:none;font-weight:600}
+.fb p{margin:3px 0 0} .fb p.vi{color:var(--muted)}
+.fb-better div{margin-top:2px}
+.trans{font-size:12.5px;color:var(--muted);padding-left:4px}
+.trans summary{cursor:pointer;width:fit-content}
+.trans div{margin-top:4px}
+.vocab{display:flex;flex-wrap:wrap;gap:6px}
+.vocab span{font-size:12px;background:var(--accent-soft);border-radius:999px;padding:3px 10px}
+.eng-input{position:sticky;bottom:0;z-index:4;background:var(--panel);padding:10px 0 4px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;border-top:1px solid var(--line)}
+.eng-input textarea{width:100%;resize:vertical;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px;min-height:46px;max-height:180px}
+.eng-input textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.eng-actions{display:flex;gap:6px;align-items:center}
+.eng-actions .btn{height:44px}
+.eng-actions .iconbtn{height:44px;width:44px;display:grid;place-items:center}
+#engMic.rec{background:var(--danger);border-color:var(--danger);color:#fff}
+
 .howto summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);width:fit-content}
 .howto summary:hover{color:var(--fg)}
 .howto p{margin:8px 0 0}
@@ -312,6 +348,9 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
   .admin-search{font-size:16px}
 }
 @media (max-width:640px){
+  .eng-bar{grid-template-columns:1fr 1fr}
+  .eng-bar .btn{grid-column:1/-1}
+  .eng-input{padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}
   .urow{grid-template-columns:40px minmax(0,1fr);grid-template-areas:"av info" ". stats" ". act"}
   .ustats{text-align:left}
   .uact{justify-content:flex-start}
@@ -394,6 +433,7 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
     <div class="tabs" role="tablist">
       <button role="tab" id="tabBtnList" aria-selected="true" aria-controls="tabList">Khoản chi</button>
       <button role="tab" id="tabBtnBudget" aria-selected="false" aria-controls="tabBudget">Ngân sách</button>
+      <button role="tab" id="tabBtnEnglish" aria-selected="false" aria-controls="tabEnglish" hidden>Tiếng Anh</button>
     </div>
 
     <section id="tabList" class="stack" role="tabpanel">
@@ -433,6 +473,36 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
       <div id="budgetRows"></div>
       <div class="err" id="bErr" hidden></div>
       <div class="row-actions"><button class="btn" id="addCat">+ Thêm mục ngân sách</button><button class="btn primary" id="saveBudget">Lưu thay đổi</button></div>
+    </section>
+
+    <section id="tabEnglish" class="stack eng" role="tabpanel" hidden>
+      <div class="eng-bar">
+        <div class="field"><label for="engScenario">Chủ đề</label>
+          <select id="engScenario">
+            <option value="free">Trò chuyện tự do</option>
+            <option value="restaurant">Gọi món ở nhà hàng</option>
+            <option value="interview">Phỏng vấn xin việc</option>
+            <option value="travel">Du lịch, sân bay, khách sạn</option>
+            <option value="shopping">Mua sắm</option>
+            <option value="office">Công việc văn phòng</option>
+            <option value="doctor">Đi khám bệnh</option>
+          </select></div>
+        <div class="field"><label for="engLevel">Trình độ</label>
+          <select id="engLevel">
+            <option value="beginner">Mới bắt đầu</option>
+            <option value="intermediate" selected>Trung cấp</option>
+            <option value="advanced">Nâng cao</option>
+          </select></div>
+        <button class="btn small" type="button" id="engNew">Hội thoại mới</button>
+      </div>
+      <div class="eng-log" id="engLog" aria-live="polite"></div>
+      <form class="eng-input" id="engForm" novalidate>
+        <textarea id="engText" rows="2" maxlength="1200" placeholder="Viết bằng tiếng Anh…" title="Enter để gửi, Shift+Enter để xuống dòng" aria-label="Tin nhắn tiếng Anh"></textarea>
+        <div class="eng-actions">
+          <button class="iconbtn" type="button" id="engMic" hidden aria-label="Nói bằng giọng nói" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+          <button class="btn primary" type="submit" id="engSend">Gửi</button>
+        </div>
+      </form>
     </section>
   </aside>
 </div>
@@ -669,7 +739,7 @@ function startFirebase() {
   auth.getRedirectResult().catch(e => toast(authError(e)));
   auth.onAuthStateChanged(user => {
     if (profileUnsub) { profileUnsub(); profileUnsub = null; }
-    me = user || null; amAdmin = false; myBlocked = false;
+    me = user || null; amAdmin = false; myBlocked = false; engReset();
     leaveView(false); closeAdmin();
     renderAccount(me);
     hideSyncBanner(); $('blockBanner').hidden = true;
@@ -705,6 +775,8 @@ async function signIn() {
 }
 function renderAccount(user) {
   const el = $('account');
+  $('tabBtnEnglish').hidden = !amAdmin;
+  if (!amAdmin && !$('tabEnglish').hidden) showTab('list');
   if (user === undefined) { el.innerHTML = '<span class="acc-text">Đang kiểm tra đăng nhập…</span>'; return; }
   if (!user) {
     el.innerHTML = '<span class="acc-text">Đăng nhập để lưu dữ liệu trên máy chủ và đồng bộ giữa các thiết bị.</span><button class="btn small primary" type="button" data-acc="in">Đăng nhập Google</button>';
@@ -835,6 +907,130 @@ function leaveView(restart = true) {
 }
 $('viewExit').onclick = () => leaveView();
 $('viewUsers').onclick = () => openAdmin();
+
+// ----- English tutor (admin only): chat with corrections explained in English and Vietnamese -----
+// Replies come from /api/english (functions/api/english.js), which keeps the Gemini key on the server.
+// The conversation is saved in vutru_chitieu/<uid>/english/current so it follows the account.
+const eng = {loaded: false, loading: null, busy: false, messages: []};
+const ENG_KEEP = 80;
+const ENG_TYPES = {grammar: 'Ngữ pháp · Grammar', vocabulary: 'Từ vựng · Vocabulary', spelling: 'Chính tả · Spelling',
+  word_order: 'Trật tự từ · Word order', naturalness: 'Tự nhiên hơn · Naturalness', translation: 'Cách nói · How to say'};
+const SPEAK = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+const canSpeak = 'speechSynthesis' in window && typeof SpeechSynthesisUtterance === 'function';
+const engDoc = () => fb.fdb.doc(`vutru_chitieu/${me.uid}/english/current`);
+function engReset() { eng.loaded = false; eng.loading = null; eng.busy = false; eng.messages = []; if ($('engLog')) renderEng(); }
+async function engOpen() {
+  if (!me || !fb) return;
+  if (!eng.loaded) {
+    if (!eng.loading) {
+      renderEng();
+      const uid = me.uid;
+      eng.loading = engDoc().get().then(s => {
+        if (!me || me.uid !== uid) return;
+        const d = s.exists ? s.data() : {};
+        eng.messages = Array.isArray(d.messages) ? d.messages : [];
+        if (d.scenario) $('engScenario').value = d.scenario;
+        if (d.level) $('engLevel').value = d.level;
+      }).catch(e => { console.warn('english load', e); toast('Không tải được lịch sử hội thoại.'); })
+        .finally(() => { eng.loaded = true; eng.loading = null; renderEng(); });
+    }
+    return;
+  }
+  renderEng();
+  setTimeout(() => $('engText').focus({preventScroll: true}), 0);
+}
+function engSave() {
+  if (!me || !fb) return;
+  eng.messages = eng.messages.slice(-ENG_KEEP);
+  engDoc().set({scenario: $('engScenario').value, level: $('engLevel').value, messages: eng.messages, updatedAt: serverNow()})
+    .catch(e => toast(failMsg('Không lưu được hội thoại', e)));
+}
+function engFeedback(f) {
+  if (!f) return '';
+  if (f.pending) return '<div class="fb pending">Đang kiểm tra câu của bạn…</div>';
+  const better = f.better ? `<div class="fb-better"><span class="eyebrow">Tự nhiên hơn · More natural</span><div>${esc(f.better)}</div></div>` : '';
+  if (f.is_correct && !(f.mistakes || []).length) return `<div class="fb ok"><b>✓ Câu đúng · Correct!</b>${better}</div>`;
+  const items = (f.mistakes || []).map(m => `<li><span class="tag">${esc(ENG_TYPES[m.type] || m.type)}</span>
+      <div class="fix">${m.original ? `<del>${esc(m.original)}</del> → ` : ''}<ins>${esc(m.correction)}</ins></div>
+      ${m.explanation_en ? `<p class="en" lang="en">${esc(m.explanation_en)}</p>` : ''}${m.explanation_vi ? `<p class="vi">${esc(m.explanation_vi)}</p>` : ''}</li>`).join('');
+  return `<div class="fb">${f.corrected ? `<div><span class="eyebrow">Câu đúng · Corrected</span><div class="fb-fix" lang="en">${esc(f.corrected)}${canSpeak ? `<button class="say" type="button" data-say="${esc(f.corrected)}" aria-label="Nghe câu đúng">${SPEAK}</button>` : ''}</div></div>` : ''}${items ? `<ol>${items}</ol>` : ''}${better}</div>`;
+}
+function renderEng() {
+  const log = $('engLog');
+  const busy = eng.busy || !eng.loaded;
+  $('engSend').disabled = busy; $('engNew').disabled = busy || !eng.messages.length;
+  if (!eng.loaded) { log.innerHTML = '<div class="empty">Đang tải hội thoại…</div>'; return; }
+  if (!eng.messages.length && eng.busy) { log.innerHTML = '<div class="msg ai"><div class="bubble typing">…</div></div>'; return; }
+  if (!eng.messages.length) {
+    log.innerHTML = `<div class="empty"><div><b>Luyện nói tiếng Anh với AI</b><br>Chọn chủ đề và trình độ, rồi bấm <b>Bắt đầu</b> để AI mở lời, hoặc tự gõ câu đầu tiên. Mỗi câu bạn viết sẽ được sửa lỗi và giải thích bằng cả tiếng Anh lẫn tiếng Việt.</div><button class="btn primary small" type="button" id="engStart"${busy ? ' disabled' : ''}>Bắt đầu</button></div>`;
+    return;
+  }
+  log.innerHTML = eng.messages.map(m => m.role === 'user'
+    ? `<div class="msg me"><div class="bubble" lang="en">${esc(m.text)}</div>${engFeedback(m.fb)}</div>`
+    : `<div class="msg ai"><div class="bubble" lang="en">${esc(m.text)}${canSpeak ? `<button class="say" type="button" data-say="${esc(m.text)}" aria-label="Nghe câu trả lời">${SPEAK}</button>` : ''}</div>
+        ${m.vi ? `<details class="trans"><summary>Bản dịch</summary><div>${esc(m.vi)}</div></details>` : ''}
+        ${(m.vocab || []).length ? `<div class="vocab">${m.vocab.map(v => `<span><b lang="en">${esc(v.word)}</b> · ${esc(v.meaning_vi)}</span>`).join('')}</div>` : ''}</div>`).join('') +
+    (eng.busy && eng.messages[eng.messages.length - 1].role === 'user' ? '' : eng.busy ? '<div class="msg ai"><div class="bubble typing">…</div></div>' : '');
+}
+function engScrollEnd() { const last = $('engLog').lastElementChild; if (last) last.scrollIntoView({block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth'}); }
+async function engCall(messages) {
+  const token = await fb.auth.currentUser.getIdToken();
+  const res = await fetch('/api/english', {method: 'POST', headers: {'content-type': 'application/json', authorization: 'Bearer ' + token},
+    body: JSON.stringify({scenario: $('engScenario').value, level: $('engLevel').value, messages: messages.map(m => ({role: m.role, text: m.text}))})});
+  let data = null; try { data = await res.json(); } catch (e) {}
+  if (!res.ok || !data) throw new Error((data && data.message) || `Máy chủ báo lỗi (${res.status}).`);
+  return data;
+}
+async function engSend(text) {
+  if (eng.busy || !eng.loaded || !me) return;
+  const start = !text;
+  const mine = start ? null : {role: 'user', text, fb: {pending: true}};
+  if (mine) eng.messages.push(mine);
+  eng.busy = true; renderEng(); engScrollEnd();
+  try {
+    const r = await engCall(eng.messages);
+    if (mine) mine.fb = {corrected: r.corrected, is_correct: r.is_correct, mistakes: r.mistakes, better: r.better};
+    eng.messages.push({role: 'tutor', text: r.reply, vi: r.reply_vi, vocab: r.vocabulary});
+    engSave();
+  } catch (e) {
+    console.error('english', e);
+    if (mine) { eng.messages.pop(); if (!$('engText').value) $('engText').value = text; }
+    toast(e.message || 'Không gửi được. Thử lại sau.');
+  } finally { eng.busy = false; renderEng(); engScrollEnd(); }
+}
+$('engForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const t = $('engText').value.trim(); if (!t || eng.busy) return;
+  $('engText').value = ''; engSend(t);
+});
+$('engText').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('engForm').requestSubmit(); } });
+$('engLog').addEventListener('click', e => {
+  if (e.target.closest('#engStart')) { engSend(null); return; }
+  const b = e.target.closest('[data-say]'); if (!b || !canSpeak) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(b.dataset.say); u.lang = 'en-US'; u.rate = 0.95; speechSynthesis.speak(u);
+});
+$('engNew').onclick = () => armOrRun($('engNew'), 'Hội thoại mới', 'Nhấn lần nữa để xóa', () => {
+  if (eng.busy) return;
+  eng.messages = []; engSave(); renderEng(); toast('Đã bắt đầu hội thoại mới.');
+});
+['engScenario', 'engLevel'].forEach(id => $(id).addEventListener('change', () => { if (eng.loaded && eng.messages.length) engSave(); }));
+// Speak instead of typing, where the browser supports speech recognition (Chrome, Edge, Safari).
+(() => {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SR) return;
+  const mic = $('engMic'); mic.hidden = false;
+  let rec = null;
+  mic.onclick = () => {
+    if (rec) { rec.stop(); return; }
+    rec = new SR(); rec.lang = 'en-US'; rec.interimResults = true; rec.continuous = false;
+    const before = $('engText').value ? $('engText').value.replace(/\s*$/, ' ') : '';
+    rec.onresult = ev => { $('engText').value = before + [...ev.results].map(r => r[0].transcript).join(''); };
+    rec.onerror = ev => { if (ev.error !== 'aborted' && ev.error !== 'no-speech') toast(ev.error === 'not-allowed' ? 'Trình duyệt chưa cho dùng micro.' : 'Không nhận được giọng nói.'); };
+    rec.onend = () => { rec = null; mic.setAttribute('aria-pressed', 'false'); mic.classList.remove('rec'); $('engText').focus(); };
+    mic.setAttribute('aria-pressed', 'true'); mic.classList.add('rec');
+    try { rec.start(); } catch (e) { rec = null; mic.setAttribute('aria-pressed', 'false'); mic.classList.remove('rec'); }
+  };
+})();
 function hideSyncBanner() { $('syncBanner').hidden = true; }
 function offerUpload(user, cloud) {
   const flag = 'tct-uploaded-' + user.uid;
@@ -1134,10 +1330,12 @@ $('filterRow').addEventListener('click', e => {
 
 // tabs
 function showTab(which) {
-  const isList = which === 'list';
-  $('tabList').hidden = !isList; $('tabBudget').hidden = isList;
-  $('tabBtnList').setAttribute('aria-selected', isList); $('tabBtnBudget').setAttribute('aria-selected', !isList);
+  [['list', 'tabList', 'tabBtnList'], ['budget', 'tabBudget', 'tabBtnBudget'], ['english', 'tabEnglish', 'tabBtnEnglish']].forEach(([k, panel, btn]) => {
+    $(panel).hidden = k !== which; $(btn).setAttribute('aria-selected', String(k === which));
+  });
+  if (which === 'english') engOpen();
 }
+$('tabBtnEnglish').onclick = () => showTab('english');
 $('tabBtnList').onclick = () => showTab('list');
 $('tabBtnBudget').onclick = () => { budgetDirty = false; renderBudget(monthItems()); showTab('budget'); };
 $('budgetRows').addEventListener('input', e => {
