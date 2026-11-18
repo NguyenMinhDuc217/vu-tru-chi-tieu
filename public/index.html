@@ -373,7 +373,7 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
   .dots{display:inline-flex;gap:2px}
   .dots i{width:7px;height:7px;border-radius:2px}
   .legend-pop{display:block;position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(100% + 2px);z-index:6;
-    width:min(340px,calc(100% - 32px));max-height:calc(58svh - 120px);overflow-y:auto;overscroll-behavior:contain;
+    width:min(340px,calc(100% - 32px));max-width:none;max-height:calc(58svh - 120px);overflow-y:auto;overscroll-behavior:contain;
     padding:12px 14px;border-radius:14px;color:#ECE9FF;background:rgba(12,10,32,.42);border:1px solid rgba(255,255,255,.16);
     box-shadow:0 12px 32px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%);
     opacity:0;visibility:hidden;transform:translateY(8px) scale(.98);transform-origin:bottom left;
@@ -1104,7 +1104,6 @@ async function engOpen() {
     return;
   }
   renderEng(); engScrollEnd(true);
-  setTimeout(() => $('engText').focus({preventScroll: true}), 0);
 }
 function engSave() {
   if (!me || !fb) return;
