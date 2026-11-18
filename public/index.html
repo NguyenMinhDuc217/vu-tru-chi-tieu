@@ -101,6 +101,36 @@ button,input,select,textarea{font:inherit;color:inherit}
 .legend span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
 .hint{opacity:.85}
+.brand-row{display:flex;align-items:center;gap:10px}
+.menu-btn{display:none}
+.app-menu{position:fixed;inset:0;z-index:25}
+.app-menu-card{position:absolute;left:max(12px,env(safe-area-inset-left,0px));width:min(360px,calc(100vw - 24px));display:grid;gap:12px;
+  padding:12px;border-radius:14px;background:var(--panel);color:var(--fg);border:1px solid var(--line);box-shadow:0 16px 40px rgba(0,0,0,.4);
+  transform-origin:top left;animation:menu-in .16s ease}
+@keyframes menu-in{from{opacity:0;transform:translateY(-6px) scale(.98)}}
+/* desktop: legend and its note sit in the footer's left half; the button and the popover only exist on small screens */
+.legend-btn{display:none}
+.legend-pop{max-width:calc(50% - 64px)}
+.legend-note{margin:6px 0 0;opacity:.85}
+/* page dots for the two 3D views */
+.pager{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:9px;padding:9px 16px;border-radius:999px;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;
+  background:rgba(14,11,34,.55);border:1px solid rgba(255,255,255,.16);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.pager button{position:relative;width:8px;height:8px;padding:0;border:0;border-radius:999px;background:rgba(236,233,255,.45);cursor:pointer;transition:width .22s ease,background .22s ease}
+.pager button::before{content:"";position:absolute;inset:-10px -6px}
+.pager button:hover{background:rgba(236,233,255,.75)}
+.pager button[aria-current="true"]{width:22px;background:#F2B24C}
+.view-cap{position:absolute;left:50%;bottom:58px;transform:translate(-50%,6px);z-index:3;pointer-events:none;white-space:nowrap;
+  padding:6px 14px;border-radius:999px;font-weight:600;font-size:13px;color:#EFECFF;background:rgba(14,11,34,.6);border:1px solid rgba(255,255,255,.16);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;transition:opacity .2s ease,transform .2s ease}
+.view-cap.show{opacity:1;transform:translate(-50%,0)}
+.stage.slide-next #scene,.stage.slide-next .labels{animation:slide-next .38s ease}
+.stage.slide-prev #scene,.stage.slide-prev .labels{animation:slide-prev .38s ease}
+.stage.bump-next #scene{animation:bump-next .3s ease}
+.stage.bump-prev #scene{animation:bump-prev .3s ease}
+@keyframes slide-next{from{opacity:.25;transform:translateX(48px)}}
+@keyframes slide-prev{from{opacity:.25;transform:translateX(-48px)}}
+@keyframes bump-next{50%{transform:translateX(-14px)}}
+@keyframes bump-prev{50%{transform:translateX(14px)}}
 .labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .lbl{position:absolute;left:0;top:0;background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:3px 8px 4px;font-size:11.5px;white-space:nowrap;box-shadow:var(--shadow);line-height:1.25;will-change:transform}
 .lbl b{display:block;font-family:var(--f-num);font-size:12px;font-weight:700}
@@ -118,6 +148,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 .month h2{margin:2px 0 0;font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:-.03em}
 .iconbtn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-size:20px;line-height:1}
 .iconbtn:hover{border-color:var(--accent)}
+.iconbtn svg{display:block;margin:auto}
+#adminReload.busy svg{animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .banner{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--warn-soft);color:var(--fg);border-radius:10px;padding:10px 12px;font-size:13px}
 .summary{display:flex;flex-direction:column;gap:12px}
 .account{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:12.5px}
@@ -234,9 +267,13 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
 
 /* Admin page: a full-screen sheet over the app */
 .modal-open,.modal-open body{overflow:hidden}
-.admin{position:fixed;inset:0;z-index:30;background:rgba(8,6,24,.6);overflow-y:auto;overscroll-behavior:contain;
+.admin{position:fixed;inset:0;z-index:30;background:rgba(8,6,24,.6);overflow:hidden;display:flex;
   padding:max(24px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(24px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.admin-box{width:min(960px,100%);margin:0 auto;align-content:start;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px;display:grid;gap:16px}
+.admin-box{width:min(960px,100%);max-height:100%;margin:0 auto;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:16px;min-height:0}
+/* header, page switch and each page's controls stay put; only the user list / the chat scrolls */
+.admin-box>*{flex:none}
+.admin-box>.admin-page,.admin-box>.eng{flex:1 1 auto;min-height:0}
+.admin-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:grid;gap:16px;align-content:start;margin-inline:-6px;padding-inline:6px}
 .admin-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .admin-head h2{margin:2px 0 0;font-family:var(--f-display);font-weight:800;font-size:26px;letter-spacing:-.03em}
 .admin-head .row-actions{align-items:center;flex-wrap:nowrap}
@@ -245,10 +282,12 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
 .admin-search{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px}
 .admin-search:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .admin-list{display:grid;gap:8px}
-.admin-page{display:grid;gap:16px}
+.admin-page{display:flex;flex-direction:column;gap:16px}
+.admin-page>:not(.admin-scroll){flex:none}
 .admin-nav{box-shadow:none;width:fit-content;align-self:start}
 .admin-nav button{padding:8px 16px}
-.admin .eng-log{min-height:40vh}
+.admin .eng-bar,.admin .eng-input{flex:none}
+.admin .eng-log{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin-inline:-6px;padding:2px 6px 8px}
 .urow{display:grid;grid-template-columns:40px minmax(0,1fr) minmax(150px,auto) auto;grid-template-areas:"av info stats act";gap:8px 14px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
 .urow.blocked{border-style:dashed;border-color:var(--danger)}
 .urow .av{grid-area:av;width:40px;height:40px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700;overflow:hidden}
@@ -293,7 +332,7 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
 .trans div{margin-top:4px}
 .vocab{display:flex;flex-wrap:wrap;gap:6px}
 .vocab span{font-size:12px;background:var(--accent-soft);border-radius:999px;padding:3px 10px}
-.eng-input{position:sticky;bottom:0;z-index:4;background:var(--panel);padding:10px 0 4px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;border-top:1px solid var(--line)}
+.eng-input{background:var(--panel);padding:10px 0 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;border-top:1px solid var(--line)}
 .eng-input textarea{width:100%;resize:vertical;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px;min-height:46px;max-height:180px}
 .eng-input textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .eng-actions{display:flex;gap:6px;align-items:center}
@@ -319,16 +358,33 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
   .stage{height:58svh;min-height:340px;max-height:640px}
   .stage-head{gap:8px;padding-top:max(12px,env(safe-area-inset-top,0px))}
   .brand h1{font-size:21px}
+  .menu-btn{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:10px;cursor:pointer;color:#EFECFF;
+    background:rgba(14,11,34,.55);border:1px solid rgba(255,255,255,.18);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .menu-btn[aria-expanded="true"]{border-color:var(--accent)}
   .mode{font-size:11px;margin-top:6px;padding:2px 9px 2px 7px}
   .seg button{padding:7px 10px;font-size:12.5px}
   .stage-foot{flex-wrap:nowrap;align-items:center;padding-bottom:10px}
   .stage-foot .row-actions{flex:none}
   .stage-foot .btn.small{padding:7px 10px;font-size:12px}
-  /* legend: one swipeable line instead of a block that covers the planets */
-  .legend{flex:1 1 auto;min-width:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:6px 0;max-width:none;
-    -webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
-  .legend::-webkit-scrollbar{display:none}
-  .hint{display:none}
+  /* legend: a button that opens a frosted-glass card, so the planets stay visible behind it */
+  .legend-btn{display:inline-flex;align-items:center;gap:7px;flex:none;color:#EFECFF;background:rgba(14,11,34,.55);border-color:rgba(255,255,255,.18);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .legend-btn[aria-expanded="true"]{border-color:var(--accent)}
+  .dots{display:inline-flex;gap:2px}
+  .dots i{width:7px;height:7px;border-radius:2px}
+  .legend-pop{display:block;position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(100% + 2px);z-index:6;
+    width:min(340px,calc(100% - 32px));max-height:calc(58svh - 120px);overflow-y:auto;overscroll-behavior:contain;
+    padding:12px 14px;border-radius:14px;color:#ECE9FF;background:rgba(12,10,32,.42);border:1px solid rgba(255,255,255,.16);
+    box-shadow:0 12px 32px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(16px) saturate(150%);backdrop-filter:blur(16px) saturate(150%);
+    opacity:0;visibility:hidden;transform:translateY(8px) scale(.98);transform-origin:bottom left;
+    transition:opacity .18s ease,transform .18s ease,visibility 0s linear .18s}
+  .legend-pop.open{opacity:1;visibility:visible;transform:none;transition:opacity .18s ease,transform .18s ease}
+  .legend{display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;max-width:none;font-size:13px;color:#ECE9FF}
+  .legend span{min-width:0;white-space:normal;line-height:1.25}
+  .legend i{width:10px;height:10px;flex:none}
+  .legend-note{display:block;margin:12px 0 0;padding-top:10px;border-top:1px solid rgba(255,255,255,.14);font-size:11.5px;line-height:1.45;color:rgba(236,233,255,.78)}
+  .pager{bottom:13px}
+  .view-cap{bottom:54px}
   .lbl{font-size:10.5px;padding:2px 6px 3px;border-radius:6px}
   .lbl b{font-size:11px}
   .god-cap{top:auto;bottom:58px;font-size:12px}
@@ -375,8 +431,8 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
   .brow .del{width:38px;height:38px}
   .sortbar select{padding:9px 10px}
   .admin{padding:0;background:var(--panel)}
-  .admin-box{min-height:100%;border:0;border-radius:0;box-shadow:none;
-    padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+  .admin-box{height:100%;border:0;border-radius:0;box-shadow:none;
+    padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
   .admin-head h2{font-size:22px}
   .admin-kpis{grid-template-columns:1fr 1fr}
   .admin-search{font-size:16px}
@@ -384,7 +440,6 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
 @media (max-width:640px){
   .eng-bar{grid-template-columns:1fr 1fr}
   .eng-bar .btn{grid-column:1/-1}
-  .eng-input{padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}
   .urow{grid-template-columns:40px minmax(0,1fr);grid-template-areas:"av info" ". stats" ". act"}
   .ustats{text-align:left}
   .uact{justify-content:flex-start}
@@ -405,18 +460,26 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
     <div class="god-cap" id="godCap" role="status" hidden></div>
     <header class="stage-head">
       <div class="brand">
-        <h1>Vũ Trụ Chi Tiêu</h1>
+        <div class="brand-row">
+          <button class="menu-btn" type="button" id="menuBtn" aria-label="Mở menu" aria-expanded="false" aria-controls="appMenu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+          <h1>Vũ Trụ Chi Tiêu</h1>
+        </div>
         <span class="mode" id="modeBadge">Đang kết nối…</span>
       </div>
-      <div class="seg" aria-label="Kiểu xem 3D">
-        <button id="viewSystem" aria-pressed="true">Hệ hành tinh</button>
-        <button id="viewCal" aria-pressed="false">Chòm sao ngày</button>
-      </div>
     </header>
+    <!-- the two 3D views are pages: press a dot, or swipe sideways on the dots -->
+    <div class="view-cap" id="viewCap" aria-hidden="true"></div>
+    <nav class="pager" id="pager" aria-label="Kiểu xem 3D">
+      <button type="button" data-view="system" aria-label="Hệ hành tinh" title="Hệ hành tinh" aria-current="true"></button>
+      <button type="button" data-view="calendar" aria-label="Chòm sao ngày" title="Chòm sao ngày" aria-current="false"></button>
+    </nav>
     <div class="stage-foot">
-      <div class="legend" id="legend"></div>
+      <button class="btn small legend-btn" type="button" id="legendBtn" aria-expanded="false" aria-controls="legendPop"><span class="dots" id="legendDots" aria-hidden="true"></span>Chú thích</button>
+      <div class="legend-pop" id="legendPop">
+        <div class="legend" id="legend"></div>
+        <p class="legend-note">Hành tinh là danh mục · Tiểu hành tinh là từng khoản chi · Lớp khí quyển là ngân sách</p>
+      </div>
       <div class="row-actions">
-        <span class="hint">Hành tinh là danh mục · Tiểu hành tinh là từng khoản chi · Lớp khí quyển là ngân sách</span>
         <button class="btn small" id="resetCam">Đặt lại góc nhìn</button>
       </div>
     </div>
@@ -522,7 +585,7 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
   <div class="admin-box">
     <header class="admin-head">
       <div><div class="eyebrow">Trang quản trị</div><h2 id="adminTitle">Người dùng</h2></div>
-      <div class="row-actions"><button class="btn small" type="button" id="adminReload">Tải lại</button><button class="iconbtn" type="button" id="adminClose" aria-label="Đóng trang quản trị">×</button></div>
+      <div class="row-actions"><button class="iconbtn" type="button" id="adminReload" aria-label="Tải lại danh sách người dùng" title="Tải lại"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button><button class="iconbtn" type="button" id="adminClose" aria-label="Đóng trang quản trị">×</button></div>
     </header>
     <nav class="seg admin-nav" aria-label="Các trang quản trị">
       <button type="button" data-apage="users" aria-pressed="true">Người dùng</button>
@@ -531,8 +594,10 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
     <div class="admin-page" id="adminUsers">
       <div class="admin-kpis" id="adminKpis"></div>
       <input class="admin-search" id="adminSearch" type="search" placeholder="Tìm theo tên hoặc email" aria-label="Tìm người dùng" autocomplete="off">
-      <div class="admin-list" id="adminList"></div>
-      <p class="note">Người dùng hiện ở đây sau khi mở app và đăng nhập. “Xem chi tiêu” mở toàn bộ dữ liệu của người đó ở chế độ chỉ xem. Tài khoản bị khóa không đọc, ghi được dữ liệu của mình trên máy chủ cho đến khi được mở khóa.</p>
+      <div class="admin-scroll" id="adminScroll">
+        <div class="admin-list" id="adminList"></div>
+        <p class="note">Người dùng hiện ở đây sau khi mở app và đăng nhập. “Xem chi tiêu” mở toàn bộ dữ liệu của người đó ở chế độ chỉ xem. Tài khoản bị khóa không đọc, ghi được dữ liệu của mình trên máy chủ cho đến khi được mở khóa.</p>
+      </div>
     </div>
     <section id="adminEnglish" class="stack eng" hidden>
       <div class="eng-bar">
@@ -564,6 +629,10 @@ form.card{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line
       </form>
     </section>
   </div>
+</div>
+<!-- Small screens: theme switch and account live in this menu instead of the panel (moved in by JS) -->
+<div class="app-menu" id="appMenu" role="dialog" aria-label="Menu" hidden>
+  <div class="app-menu-card" id="appMenuCard"></div>
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
 
@@ -901,7 +970,7 @@ function adminShow(page) {
   $('adminUsers').hidden = en; $('adminEnglish').hidden = !en; $('adminReload').hidden = en;
   $('adminTitle').textContent = en ? 'Học tiếng Anh' : 'Người dùng';
   document.querySelectorAll('[data-apage]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.apage === adminPage)));
-  $('admin').scrollTop = 0;
+  $('adminScroll').scrollTop = 0;
   if (en) engOpen();
   else if (!adminUsers) loadAdmin(); else renderAdmin();
 }
@@ -916,6 +985,7 @@ function closeAdmin() { $('admin').hidden = true; document.documentElement.class
 async function loadAdmin() {
   const seq = ++adminLoadSeq;
   adminUsers = null; renderAdmin();
+  $('adminReload').classList.add('busy');
   try {
     const snap = await fb.fdb.collection('vutru_chitieu').get({source: 'server'});
     if (seq !== adminLoadSeq) return;
@@ -930,6 +1000,8 @@ async function loadAdmin() {
     if (seq !== adminLoadSeq) return;
     $('adminKpis').innerHTML = '';
     $('adminList').innerHTML = `<div class="empty">Không tải được danh sách người dùng${e && e.code ? ' (' + esc(e.code) + ')' : ''}. Kiểm tra mạng và Firestore Rules.</div>`;
+  } finally {
+    if (seq === adminLoadSeq) $('adminReload').classList.remove('busy');
   }
 }
 function renderAdmin() {
@@ -1027,11 +1099,11 @@ async function engOpen() {
         if (d.scenario) $('engScenario').value = d.scenario;
         if (d.level) $('engLevel').value = d.level;
       }).catch(e => { console.warn('english load', e); toast('Không tải được lịch sử hội thoại.'); })
-        .finally(() => { eng.loaded = true; eng.loading = null; renderEng(); });
+        .finally(() => { eng.loaded = true; eng.loading = null; renderEng(); engScrollEnd(true); });
     }
     return;
   }
-  renderEng();
+  renderEng(); engScrollEnd(true);
   setTimeout(() => $('engText').focus({preventScroll: true}), 0);
 }
 function engSave() {
@@ -1067,7 +1139,7 @@ function renderEng() {
         ${(m.vocab || []).length ? `<div class="vocab">${m.vocab.map(v => `<span><b lang="en">${esc(v.word)}</b> · ${esc(v.meaning_vi)}</span>`).join('')}</div>` : ''}</div>`).join('') +
     (eng.busy && eng.messages[eng.messages.length - 1].role === 'user' ? '' : eng.busy ? '<div class="msg ai"><div class="bubble typing">…</div></div>' : '');
 }
-function engScrollEnd() { const last = $('engLog').lastElementChild; if (last) last.scrollIntoView({block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth'}); }
+function engScrollEnd(instant) { const log = $('engLog'); log.scrollTo({top: log.scrollHeight, behavior: instant || reduceMotion ? 'auto' : 'smooth'}); }
 async function engCall(messages) {
   const token = await fb.auth.currentUser.getIdToken();
   const res = await fetch('/api/english', {method: 'POST', headers: {'content-type': 'application/json', authorization: 'Bearer ' + token},
@@ -1260,7 +1332,42 @@ function fillCatSelects() {
   document.querySelectorAll('#lines select[data-f="cat"]').forEach(sel => { const v = sel.value; sel.innerHTML = catOptions(CAT[v] ? v : CATS[0].id); paintLine(sel.closest('.line')); });
 }
 function catOptions(selected) { return CATS.map(c => `<option value="${esc(c.id)}"${c.id === selected ? ' selected' : ''}>${esc(c.name)}</option>`).join(''); }
-function renderLegend() { $('legend').innerHTML = CATS.map(c => `<span><i style="background:${c.color}"></i>${esc(c.name)}</span>`).join(''); }
+function renderLegend() {
+  $('legend').innerHTML = CATS.map(c => `<span><i style="background:${c.color}"></i>${esc(c.name)}</span>`).join('');
+  $('legendDots').innerHTML = CATS.slice(0, 3).map(c => `<i style="background:${c.color}"></i>`).join('');
+}
+// Small screens: theme switch and account move from the panel into a menu opened next to the title.
+(() => {
+  const small = matchMedia('(max-width: 860px)');
+  const menu = $('appMenu'), card = $('appMenuCard'), btn = $('menuBtn');
+  const prefs = document.querySelector('.prefs'), account = $('account'), install = $('install');
+  const place = () => {
+    if (small.matches) { card.append(prefs, account); return; }
+    install.before(prefs); install.after(account); close();
+  };
+  const open = () => {
+    const r = btn.getBoundingClientRect();
+    card.style.top = Math.round(r.bottom + 8) + 'px';
+    menu.hidden = false; btn.setAttribute('aria-expanded', 'true');
+  };
+  function close() { if (menu.hidden) return; menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+  btn.onclick = () => (menu.hidden ? open() : close());
+  menu.addEventListener('click', e => { if (e.target === menu || e.target.closest('[data-acc]')) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) { close(); btn.focus(); } });
+  addEventListener('scroll', close, {passive: true});
+  small.addEventListener('change', place);
+  place();
+})();
+// Small screens: the legend opens from a button. A tap outside closes it; dragging to turn the 3D view does not.
+(() => {
+  const pop = $('legendPop'), btn = $('legendBtn');
+  const set = open => { pop.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); };
+  btn.onclick = () => set(!pop.classList.contains('open'));
+  let down = null;
+  document.addEventListener('pointerdown', e => { down = pop.classList.contains('open') && !pop.contains(e.target) && !btn.contains(e.target) ? [e.clientX, e.clientY] : null; });
+  document.addEventListener('pointerup', e => { if (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) < 8) set(false); down = null; });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && pop.classList.contains('open')) { set(false); btn.focus(); } });
+})();
 
 function refresh() {
   const items = monthItems();
@@ -2286,15 +2393,55 @@ function capturePlanet(catId) {
 const curR = catId => { const i = planetInfo.get(catId); return i ? i.r : null; };
 const rockSize = id => { const m = meshById.get(id); return m ? (m.userData.s || .08) : .08; };
 
+// The two 3D views are pages, shown as dots under the scene: press a dot, or swipe sideways on the dots.
+const VIEWS = [{id: 'system', name: 'Hệ hành tinh'}, {id: 'calendar', name: 'Chòm sao ngày'}];
+let viewCapT = 0;
+function stageAnim(cls) {
+  stage.classList.remove('slide-next', 'slide-prev', 'bump-next', 'bump-prev');
+  if (reduceMotion) return;
+  void stage.offsetWidth; stage.classList.add(cls);
+}
 function setView(v) {
   if (state.view === v) return;
+  const dir = VIEWS.findIndex(x => x.id === v) > VIEWS.findIndex(x => x.id === state.view) ? 'next' : 'prev';
   godAbort();
   state.view = v;
-  $('viewSystem').setAttribute('aria-pressed', v === 'system'); $('viewCal').setAttribute('aria-pressed', v === 'calendar');
+  $('pager').querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-current', String(b.dataset.view === v)));
+  const cap = $('viewCap'); cap.textContent = VIEWS.find(x => x.id === v).name; cap.classList.add('show');
+  clearTimeout(viewCapT); viewCapT = setTimeout(() => cap.classList.remove('show'), 1400);
+  stageAnim('slide-' + dir);
   rebuildScene(true);
 }
-$('viewSystem').onclick = () => setView('system');
-$('viewCal').onclick = () => setView('calendar');
+function stepView(d) {
+  const i = VIEWS.findIndex(x => x.id === state.view) + d;
+  if (i < 0 || i >= VIEWS.length) { stageAnim(d > 0 ? 'bump-next' : 'bump-prev'); return; }
+  setView(VIEWS[i].id);
+}
+$('pager').addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (b) setView(b.dataset.view); });
+$('pager').addEventListener('keydown', e => {
+  if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+  e.preventDefault(); stepView(e.key === 'ArrowRight' ? 1 : -1);
+  const cur = $('pager').querySelector('[aria-current="true"]'); if (cur) cur.focus();
+});
+// Swipe on the dots to change page (the scene itself keeps every drag for turning the camera).
+(() => {
+  const pager = $('pager');
+  let sw = null, swiped = false;
+  pager.addEventListener('pointerdown', e => {
+    if (!e.isPrimary) return;
+    sw = {id: e.pointerId, x: e.clientX, y: e.clientY}; swiped = false;
+    try { pager.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  pager.addEventListener('pointermove', e => {
+    if (!sw || e.pointerId !== sw.id) return;
+    const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+    if (Math.abs(dx) > 24 && Math.abs(dx) > Math.abs(dy)) { stepView(dx < 0 ? 1 : -1); swiped = true; sw = null; }
+  });
+  const end = e => { if (sw && e.pointerId === sw.id) sw = null; };
+  pager.addEventListener('pointerup', end); pager.addEventListener('pointercancel', end);
+  // a swipe that ends over a dot must not also count as pressing that dot
+  pager.addEventListener('click', e => { if (swiped) { e.stopImmediatePropagation(); swiped = false; } }, true);
+})();
 
 try { initScene(); }
 catch (e) { renderer = null; canvas.hidden = true; const d = document.createElement('div'); d.className = 'nogl'; d.textContent = 'Trình duyệt này không hiển thị được mô hình 3D (WebGL). Bạn vẫn quản lý chi tiêu được ở bảng bên cạnh.'; stage.appendChild(d); }
